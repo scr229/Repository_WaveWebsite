@@ -42,7 +42,7 @@ const scenes = {
         description: 'The path winds upward. The air grows crisp and clean. In the distance, you see a village with smoke rising from chimneys.',
         choices: [
             { text: '▲ Go upstairs', next: 'secondfloor' },
-            { text: '◀ Read paper', next: 'paper', item: 'seen' },
+            { text: '◀ Read paper', next: 'paper' },
             { text: '▼ Step Back', next: 'front' }
         ]
     },
