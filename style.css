@@ -1,0 +1,173 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@import url("https://use.typekit.net/ixv1ere.css");
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: black;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.title-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+}
+
+.title-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.game-title {
+    font-family: "old-man-eloquent", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 80px;
+    color: white;
+}
+
+.start-button {
+    background: #000000;
+    color: rgb(255, 255, 255);
+    border: 0.25px solid white;
+    padding: 5px 80px;
+    font-family: "edu-nsw-act-hand-precursive", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.start-button:hover {
+    background: #ddd;
+}
+
+.black-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: black;
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.black-screen.active {
+    opacity: 1;
+}
+
+.game-container {
+    width: 100%;
+    text-align: center;
+    height: 100vh;
+}
+
+.game-text {
+    width: 33%;
+    text-align: center;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    height: 100vh;
+    z-index: 10;
+}
+
+.image-container {
+    height: 100vh;
+    text-align: center;
+    object-position: center;
+    width: auto;
+    flex-shrink: 0;
+    padding: 1%;
+}
+
+.game-image {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    object-position: center;
+    transition: opacity 0.3s ease;
+}
+
+.fade-out {
+    opacity: 0;
+}
+
+.right-panel {
+    flex: 1;
+    position: relative;
+    height: 100vh;
+    right: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.scene-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+
+.choices-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    margin-bottom: 30px;
+
+}
+
+.choice-button {
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 15px 25px;
+    font-size: 16px;
+    font-family: "consolas", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: left;
+    background-color: #000000;
+}
+
+.choice-button:hover {
+    border: white 1px solid;
+}
+
+.inventory {
+    padding-top: 20px;
+    border-top: 1px solid #333;
+    font-size: 14px;
+    color: #888;
+    position: fixed;
+    bottom: 0;
+}
+
+.inventory-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
