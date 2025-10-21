@@ -21,28 +21,82 @@
     </style>
 </head>
 <body>
+    <!-- Debug Toggle (remove in production) -->
+    <button class="debug-toggle" onclick="toggleDebugMode()">Toggle Debug</button>
+
+    <!-- Mouse Position Display (for hotspot placement) -->
+    <div class="mouse-position" id="mousePosition">
+        <div>X: <span id="mouseX">0</span>%</div>
+        <div>Y: <span id="mouseY">0</span>%</div>
+        <div style="margin-top: 5px; border-top: 1px solid rgba(0,255,0,0.3); padding-top: 5px;">
+            Click to copy
+        </div>
+    </div>
+
+    <!-- Title Screen -->
     <div class="title-screen" id="titleScreen">
-        <br><br><br><br><br>
         <div class="game-title">The Lost Generator</div>
-        <br><br><br><br><br>
         <button class="start-button" onclick="startGame()">Search</button>
     </div>
     
+    <!-- Black Screen Transition -->
     <div class="black-screen" id="blackScreen"></div>
 
-    <div class="game-container">
+    <!-- Game Container -->
+    <div class="game-container" id="gameContainer">
         <div class="image-container">
             <img id="gameImage" class="game-image" src="" alt="Game Scene">
+            <div id="hotspotsContainer" class="hotspots-container"></div>
         </div>
-
     </div>
 
-    <div class="game-text">
-        <div class="right-panel">
-            <div id="choicesContainer" class="choices-container"></div>
+    <!-- Inventory Display -->
+    <div class="inventory">
+        <div class="inventory-title">Inventory</div>
+        <div id="inventoryItems">Empty</div>
+        <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 10px;">
+            Decisions: <span id="decisionCount">0</span>
         </div>
-        <div class="inventory"></div>
     </div>
+
+    <!-- Close-up Image Overlay -->
+    <div class="overlay" id="imageOverlay" onclick="closeOverlay()">
+        <img id="overlayImage" class="overlay-image" src="" alt="Close-up">
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="Audio/Background_waves.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="stepSound">
+        <source src="Audio/Footstep_sand.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="paperSound">
+        <source src="Audio/paper.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="switchSound">
+        <source src="Audio/click.wav" type="audio/mpeg">
+    </audio>
+
+    <audio id="metalstepSound">
+        <source src="Audio/Footstep_metal.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="metalsqueakSound">
+        <source src="Audio/metalsqueak.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="splashSound">
+        <source src="Audio/splash.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Audio Control Button -->
+    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()">
+        🔊
+    </button>
     
     <script src="script.js"></script>
 </body>

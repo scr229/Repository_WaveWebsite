@@ -1,341 +1,637 @@
-// Game state
-let gameState = {
-    currentScene: 'intro',
-    inventory: [''],
-    decisionCount: 0
-};
+       // Game state
+        let gameState = {
+            currentScene: 'plane',
+            inventory: ['seen'],
+            decisionCount: 0,
+            audioEnabled: true
+        };
 
-// Scene definitions
-const scenes = {
-    intro: {
-        title: 'The Beginning',
-        images: {
-            default: 'Photos/Render_Approach.png',
-            stage2: 'https://images.unsplash.com/photo-1511497584788-876760111969?w=800',
-            stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
-        },
-        description: 'You wake up in a mysterious forest. The morning sun filters through ancient trees. A path splits in two directions ahead.',
-        choices: [
-            { text: '▲ Approach', next: 'front' }
-        ]
-    },
-    front: {
-        title: 'Front',
-        images: {
-            default: 'Photos/Render_Front.png',
-            stage2: 'Photos/Render_Front_Rain.png',
-            stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
-        },
-        description: 'The trees grow thick and the light dims. You hear rustling in the bushes. A glint of metal catches your eye on the ground.',
-        choices: [
-            { text: '▲ Get closer', next: 'ground', item: 'Ancient Sword' },
-            { text: '◀ Go to the beach', next: 'beach' }
-        ]
-    },
-    ground: {
-        title: 'Mountain Path',
-        images: {
-            default: 'Photos/Render_Ground_rain.png',
-            stage2: 'Photos/Render_Ground.png',
-            stage3: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
-        },
-        description: 'The path winds upward. The air grows crisp and clean. In the distance, you see a village with smoke rising from chimneys.',
-        choices: [
-            { text: '▲ Go upstairs', next: 'secondfloor' },
-            { text: '◀ Read paper', next: 'paper' },
-            { text: '▼ Step Back', next: 'front' }
-        ]
-    },
-    paper: {
-        title: 'Mountain Path',
-        images: {
-            default: 'Photos/Paper.png',
-            stage2: 'Photos/Paper.png',
-            stage3: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
-        },
-        description: 'The path winds upward. The air grows crisp and clean. In the distance, you see a village with smoke rising from chimneys.',
-        choices: [
-            { text: '▼ Put back', next: 'ground' }
-        ]
-    },
-    secondfloor: {
-        title: 'Found Treasure',
-        images: {
-            default: gameState.inventory.includes('PowerOn') 
-                ? 'Photos/Render_2nd_On.png'
-                : 'Photos/Render_2nd_Off.png',
-            stage2: gameState.inventory.includes('PowerOn') 
-                ? 'Photos/Render_2nd_On_rain.png'
-                : 'Photos/Render_2nd_Off_rain.png',
-            stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
-        },
-        description: 'You pick up an ancient sword! It feels powerful in your hands. The path continues deeper into the woods.',
-        choices: [
-            { text: '▲ Go upstairs', next: 'thirdfloor' },
-            { text: '▶ Check Batteries', next: 'servers' },
-            { text: '▼ Go Downstairs', next: 'ground' }
-        ]
-    },
-    servers: {
-        title: 'Found Treasure',
-        images: {
-            default: gameState.inventory.includes('PowerOn') 
-                ? 'Photos/Render_Servers_On.png'
-                : 'Photos/Render_Servers_Off.png',
-            stage2: gameState.inventory.includes('PowerOn') 
-                ? 'Photos/Render_Servers_On.png'
-                : 'Photos/Render_Servers_Off.png',
-            stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
-        },
-        description: 'You pick up an ancient sword! It feels powerful in your hands. The path continues deeper into the woods.',
-        choices: [
-            { text: '◆ Flip switch',next: 'servers', item: gameState.inventory.includes('BuoyPlaced') 
-                                            ? 'powerOn'
-                                            : '', },
-            { text: '▼ Step back', next: 'secondfloor' }
-        ]
-    },
-    thirdfloor: {
-        title: 'Mysterious Cave',
-        images: {
-            default: 'Photos/Render_3rd.png',
-            stage2: 'Photos/Render_3rd_rain.png',
-            stage3: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=800'
-        },
-        description: gameState.inventory.includes('Ancient Sword') 
-            ? 'You enter the cave with your sword drawn. A dragon sleeps inside! With your weapon, you feel confident.'
-            : 'You enter a dark cave. A dragon sleeps inside! Without a weapon, this seems dangerous.',
-        choices: [
-            { text: '◀ Check Lookout', next: 'lookout' },
-            { text: '▼ Go Downstairs', next: 'secondfloor' }
-        ]
-    },
-    lookout: {
-        title: 'Peaceful Village',
-        images: {
-            default: gameState.inventory.includes('BuoyPlaced') 
-                    ? 'Photos/Render_Lookout.png'
-                    : 'Photos/Render_Lookout_gone.png',
-            stage2: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
-            stage3: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800'
-        },
-        description: 'Friendly villagers greet you warmly. They offer you food and shelter. This could be a good place to rest.',
-        choices: [
-            { text:'▲ Look', next: 'telescope', item: 'seen', condition: () => !gameState.inventory.includes('buoy') },
-            { text: '▼ Step back', next: 'thirdfloor' }
-        ]
-    },
-    telescope: {
-        title: 'Dragon Encounter',
-        images: {
-            default: 'Photos/Render_Buoy_Telescope.png',
-            stage2: 'Photos/Render_Buoy_Telescope.png',
-            stage3: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800'
-        },
-        description: gameState.inventory.includes('Ancient Sword')
-            ? 'With your ancient sword, you face the dragon bravely! After an epic battle, the dragon respects your courage and becomes your ally.'
-            : 'Without a weapon, you barely escape with your life! The dragon roars as you flee.',
-        choices: [
-            { text: '▼ Step back', next: 'lookout' }
-        ]
-    },
-    beach: {
-        title: 'Hidden Treasure',
-        images: {
-            default: 'Photos/Render_Beach.png',
-            stage2: 'Photos/Render_Beach_rain.png',
-            stage3: 'https://images.unsplash.com/photo-1610375229632-c4a8e1ec07fa?w=800'
-        },
-        description: 'You sneak past the sleeping dragon and find an enormous treasure hoard! Gold and jewels sparkle in the dim light.',
-        choices: [
-            { text: '▲ Take boat', next: 'ocean' },
-            { text: '▶Check grass', condition: () => gameState.inventory.includes('seen')  },
-            { text: '▼ Back to machine', next: 'front' }
-        ]
-    },
-    grass: {
-        title: 'Peaceful Ending',
-        images: {
-            default: gameState.inventory.includes('Buoy') 
-                    ? 'Photos/Render_Buoy_Grass_none.png'
-                    : 'Photos/Render_Buoy_Grass.png', 
-            stage2: gameState.inventory.includes('Buoy') 
-                    ? 'Photos/Render_Buoy_Grass_none_rain.png'
-                    : 'Photos/Render_Buoy_Grass_rain.png', 
-            stage3: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800'
-        },
-        description: 'You settle down in the village and live a peaceful life. Sometimes the greatest adventure is finding home. THE END',
-        choices: [
-            { text: gameState.inventory.includes('Buoy') 
-                    ? ''
-                    : 'Take', next: 'grass', 
-                item: 'Buoy' },
-            { text: '▼ Back to beach', next: 'beach' }
-        ]
-    },
-    endingExplorer: {
-        title: 'Explorer Ending',
-        images: {
-            default: 'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800',
-            stage2: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-            stage3: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800'
-        },
-        description: 'You conquered the highest peak! Your name will be remembered as a legendary explorer. THE END',
-        choices: [
-            { text: 'Start Over', next: 'intro' }
-        ]
-    },
-    endingDragon: {
-        title: 'Dragon Rider Ending',
-        images: {
-            default: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800',
-            stage2: 'https://images.unsplash.com/photo-1582747652673-519e8c485785?w=800',
-            stage3: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800'
-        },
-        description: 'With a dragon as your companion, you soar through the skies! Together you protect the realm. THE END',
-        choices: [
-            { text: 'Start Over', next: 'intro' }
-        ]
-    },
-    endingRich: {
-        title: 'Wealthy Ending',
-        images: {
-            default: 'https://images.unsplash.com/photo-1611557966610-0e5ef0f15c1f?w=800',
-            stage2: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?w=800',
-            stage3: 'https://images.unsplash.com/photo-1610375229632-c4a8e1ec07fa?w=800'
-        },
-        description: 'You escape with the treasure and live in luxury for the rest of your days! THE END',
-        choices: [
-            { text: 'Start Over', next: 'intro' }
-        ]
-    },
-    specialEvent: {
-    title: 'The Turning Point',
-    images: {
-        default: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800',
-        stage2: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800',
-        stage3: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800'
-    },
-    description: 'Something has changed. The world around you shifts and warps. You feel the weight of all your decisions pressing down. A mysterious figure appears before you, offering a choice that will change everything.',
-    choices: [
-        { text: 'Accept the mysterious power', next: 'intro', item: 'Ancient Sword' },
-        { text: 'Reject and continue your journey', next: 'intro' }
-    ]
-}
-};
+        // Audio elements
+        let bgMusic;
+        let soundEffects = {};  // Store all sound effects here
 
-// Get the correct image based on decision count
-function getSceneImage(scene) {
-    if (gameState.decisionCount >= 100) {
-        return scene.images.stage3;
-    } else if (gameState.decisionCount >= 20) {
-        return scene.images.stage2;
-    } else {
-        return scene.images.default;
-    }
-}
+        // Sound effect configuration
+        const soundConfig = {
+            step: { volume: 0.5 },
+            item: { volume: 0.6 },
+            door: { volume: 0.7 },
+            splash: { volume: 0.4 },
+            switch: { volume: 0.8 },
+            metalstep: { volume: 0.8 },
+            paper: { volume: 0.3 },
+            metalsqueak: { volume: 0.5 },
+        };
 
-// Load a scene
-function loadScene(sceneKey) {
-    gameState.currentScene = sceneKey;
-    const scene = scenes[sceneKey];
-    
-    const img = document.getElementById('gameImage');
-    img.classList.add('fade-out');
-    
-    setTimeout(() => {
-        // Update image and title
-        img.src = getSceneImage(scene);
-        img.classList.remove('fade-out');
-        
-        // Update description (add if you have an element for it)
-        const descEl = document.getElementById('description');
-        if (descEl) descEl.textContent = scene.description || '';
-        
-        // Render choices
-        const choicesContainer = document.getElementById('choicesContainer');
-        choicesContainer.innerHTML = '';
+        // Scene definitions with hotspots
+        const scenes = {
+            plane: {
+                title: 'Crash Site',
+                images: {
+                    default: 'Photos/Render_plane.png',
+                    stage2: 'Photos/Render_plane.png',
+                    stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 50,
+                        y: 79,
+                        width: 2.7,
+                        height: 5.5,
+                        type: 'inspect',
+                        inspectImage: 'Photos/Render_Phone_Dead_single.png',
+                        item: null,
+                        sound: 'switch'
+                    },
+                    {
+                        x: 50,
+                        y: 37,
+                        width: 10,
+                        height: 11,
+                        next: 'intro',
+                        item: null,
+                        sound: 'step'
+                    }
+                ]
+            },
+            intro: {
+                title: 'Approach',
+                images: {
+                    default: 'Photos/Render_Approach.png',
+                    stage2: 'Photos/Render_Approach_rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 57,
+                        y: 69,
+                        width: 3,
+                        height: 4,
+                        type: 'inspect',
+                        inspectImage: 'Photos/Battery_diagram.png',
+                        item: null,
+                        sound: 'paper'
+                    },
+                    {
+                        x: 31,      // % from left
+                        y: 39,      // % from top
+                        width: 14,  // % width
+                        height: 19, // % height
+                        next: 'front',
+                        item: null,
+                        sound: 'step'  // Sound effect to play
+                    },
+                    {
+                        x: 46,      // % from left
+                        y: 50,      // % from top
+                        width: 9,  // % width
+                        height: 8, // % height
+                        next: 'beach',
+                        item: null,
+                        sound: 'step'  // Sound effect to play
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'plane',
+                        item: null,
+                        sound: 'step'
+                    }
+                ]
+            },
+            front: {
+                title: 'Front',
+                images: {
+                    default: 'Photos/Render_Front.png',
+                    stage2: 'Photos/Render_Front_Rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 41,
+                        y: 55,
+                        width: 15,
+                        height: 20,
+                        next: 'ground',
+                        item: null,
+                        sound: 'step'
+                    },
+                    {
+                        x: 56,
+                        y: 74,
+                        width: 11,
+                        height: 15,
+                        next: 'grass',
+                        item: null,
+                        condition: () => gameState.inventory.includes('seen'),
+                        sound: 'step'
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'intro',
+                        item: null,
+                        sound: 'step'
+                    }
+                ]
+            },
+            ground: {
+                title: 'Ground Level',
+                images: {
+                    default: 'Photos/Render_Ground.png',
+                    stage2: 'Photos/Render_Ground_rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 41.5,
+                        y: 54,
+                        width: 10,
+                        height: 18.5,
+                        next: 'secondfloor',
+                        item: null,
+                        sound: 'metalstep'
+                    },
+                    {
+                        x: 35,
+                        y: 46,
+                        width: 5,
+                        height: 4,
+                        type: 'inspect',
+                        inspectImage: 'Photos/Section_Crumpled.png',
+                        item: null,
+                        sound: 'paper'
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'front',
+                        item: null,
+                        sound: 'step'
+                    }
+                ]
+            },
+            secondfloor: {
+                title: 'Second Floor',
+                images: {
+                    default: 'Photos/Render_2nd_Off.png',
+                    stage2: 'Photos/Render_2nd_Off_rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 35,
+                        y: 46,
+                        width: 20,
+                        height: 21,
+                        next: 'thirdfloor',
+                        item: null,
+                        sound: 'metalstep'
+                    },
+                    {
+                        x: 60,
+                        y: 31,
+                        width: 6,
+                        height: 65,
+                        next: 'servers',
+                        item: null,
+                        sound: 'metalsqueak'
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'ground',
+                        item: null,
+                        sound: 'metalstep'
+                    }
+                ]
+            },
+            servers: {
+                title: 'Battery Room',
+                images: {
+                    default: 'Photos/Render_Servers_Off.png',
+                    stage2: 'Photos/Render_Servers_Off.png',
+                    stage3: 'Photos/Render_Servers_Off.png'
+                },
+                hotspots: [
+                    {
+                        x: 45,
+                        y: 50,
+                        width: 10,
+                        height: 15,
+                        next: 'servers',
+                        item: 'PowerOn',
+                        condition: () => gameState.inventory.includes('BuoyPlaced'),
+                        sound: 'item'
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'secondfloor',
+                        item: null,
+                        sound: 'metalstep'
+                    }
+                ]
+            },
+            thirdfloor: {
+                title: 'Third Floor',
+                images: {
+                    default: 'Photos/Render_3rd.png',
+                    stage2: 'Photos/Render_3rd_rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 31,
+                        y: 61,
+                        width: 14,
+                        height: 17,
+                        next: 'lookout',
+                        item: null,
+                        sound: 'metalstep'
+                    },
+                    {
+                        x: 44,
+                        y: 19,
+                        width: 2.5,
+                        height: 3,
+                        type: 'inspect',
+                        inspectImage: 'Photos/axo_drawing.png',
+                        item: null,
+                        sound: 'paper'
+                    },
+                    {
+                        x: 55,
+                        y: 66,
+                        width: 13,
+                        height: 34,
+                        next: 'secondfloor',
+                        item: null,
+                        sound: 'metalstep'
+                    }
+                ]
+            },
+            lookout: {
+                title: 'Lookout',
+                images: {
+                    default: gameState.inventory.includes('buoyPlaced') 
+                            ? 'Photos/Render_Lookout.png'
+                            : 'Photos/Render_Lookout_gone.png',
+                    stage2: gameState.inventory.includes('buoyPlaced') 
+                            ? 'Photos/Render_Lookout.png'
+                            : 'Photos/Render_Lookout_gone.png',
+                    stage3: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 34,
+                        y: 36,
+                        width: 15,
+                        height: 29,
+                        next: 'lookout',
+                        type: 'inspect',
+                        item: 'seen',
+                        inspectImage: 'Photos/Render_Buoy_Telescope.png',
+                        condition: () => !gameState.inventory.includes('buoyPlaced'),
+                        condition: () => !gameState.inventory.includes('buoy'),
+                        sound: 'metalsqueak'
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'thirdfloor',
+                        item: null,
+                        sound: 'metalstep'
+                    }
+                ]
+            },
+            beach: {
+                title: 'Beach',
+                images: {
+                    default: 'Photos/Render_Beach.png',
+                    stage2: 'Photos/Render_Beach_rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1610375229632-c4a8e1ec07fa?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 52,
+                        y: 57,
+                        width: 6,
+                        height: 4,
+                        next: 'ocean',
+                        item: null,
+                        sound: 'splash'
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'intro',
+                        item: null,
+                        sound: 'step'
+                    }
+                ]
+            },
+            grass: {
+                title: 'Grass',
+                images: {
+                    default: gameState.inventory.includes('buoy') 
+                            ? 'Photos/Render_Buoy_Grass_none.png'
+                            : 'Photos/Render_Buoy_Grass.png',
+                    stage2: gameState.inventory.includes('buoy') 
+                            ? 'Photos/Render_Buoy_Grass_none_rain.png'
+                            : 'Photos/Render_Buoy_Grass_rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 39,
+                        y: 26,
+                        width: 13,
+                        height: 47,
+                        next: 'grass',
+                        item: 'buoy',
+                        condition: () => !gameState.inventory.includes('buoy'),
+                        sound: 'metalstep'
+                    },
+                    {
+                        x: 30,
+                        y: 91,
+                        width: 38,
+                        height: 9,
+                        next: 'front',
+                        item: null,
+                        sound: 'step'
+                    }
+                ]
+            },
+            ocean: {
+                title: 'Ocean',
+                images: {
+                    default: 'Photos/Render_Buoy_none.png',
+                    stage2: 'Photos/Render_Buoy_rain.png',
+                    stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+                },
+                hotspots: [
+                    {
+                        x: 40,
+                        y: 40,
+                        width: 20,
+                        height: 30,
+                        next: 'beach',
+                        item: null,
+                        sound: 'click'
+                    }
+                ]
+            }
+        };
 
-        scene.choices.forEach(choice => {
-            // ✅ Always visible unless condition returns false
-            const passesCondition = 
-                typeof choice.condition === 'function' 
-                    ? choice.condition() 
-                    : true;
+        // Get the correct image based on decision count
+        function getSceneImage(scene) {
+            if (gameState.decisionCount >= 100) {
+                return scene.images.stage3;
+            } else if (gameState.decisionCount >= 20) {
+                return scene.images.stage2;
+            } else {
+                return scene.images.default;
+            }
+        }
 
-            if (!passesCondition) return; // skip only if explicitly false
+        // Load a scene
+        function loadScene(sceneKey) {
+            gameState.currentScene = sceneKey;
+            const scene = scenes[sceneKey];
+            
+            const img = document.getElementById('gameImage');
+            img.classList.add('fade-out');
 
-            // ✅ Handle dynamic or static text
-            let text = typeof choice.text === 'function'
-                ? choice.text()
-                : choice.text;
-
-            // ✅ Provide a fallback if text is missing
-            if (!text || text.trim() === '') {
-                console.warn(`Choice in scene "${sceneKey}" has no text:`, choice);
+                // Check if special event should trigger
+            if (gameState.decisionCount === 22 && choice.next !== 'specialEvent') {
+                loadScene('specialEvent');
                 return;
             }
+            
+            setTimeout(() => {
+                // Update image
+                img.src = getSceneImage(scene);
+                img.classList.remove('fade-out');
+                
+                // Render hotspots
+                renderHotspots(scene);
+                
+                // Update inventory display
+                updateInventory();
+            }, 300);
+        }
 
-            // ✅ Create and append the button
-            const button = document.createElement('button');
-            button.className = 'choice-button';
-            button.textContent = text;
-            button.onclick = () => makeChoice(choice);
-            choicesContainer.appendChild(button);
+        // Render hotspots for current scene
+        function renderHotspots(scene) {
+            const container = document.getElementById('hotspotsContainer');
+            container.innerHTML = '';
+            
+            if (!scene.hotspots) return;
+            
+            scene.hotspots.forEach((hotspot, index) => {
+                // Check condition if exists
+                if (hotspot.condition && !hotspot.condition()) {
+                    return; // Skip this hotspot
+                }
+                
+                const hotspotDiv = document.createElement('div');
+                hotspotDiv.className = 'hotspot';
+                hotspotDiv.style.left = hotspot.x + '%';
+                hotspotDiv.style.top = hotspot.y + '%';
+                hotspotDiv.style.width = hotspot.width + '%';
+                hotspotDiv.style.height = hotspot.height + '%';
+                
+                hotspotDiv.onclick = () => {
+                    if (hotspot.type === 'inspect') {
+                        openOverlay(hotspot.inspectImage);
+                        playSound(hotspot.sound);
+                    } else {
+                        makeChoice(hotspot);
+                    }
+                };
+                
+                container.appendChild(hotspotDiv);
+            });
+        }
+
+        // Handle hotspot click
+        function makeChoice(hotspot) {
+            // Play sound effect
+            playSound(hotspot.sound);
+            
+            // Increment decision counter
+            gameState.decisionCount++;
+            
+            // Add item to inventory if hotspot has one
+            if (hotspot.item && !gameState.inventory.includes(hotspot.item)) {
+                gameState.inventory.push(hotspot.item);
+            }
+            
+            // Load next scene
+            loadScene(hotspot.next);
+        }
+
+        // Play sound effect
+        function playSound(soundType) {
+            if (!gameState.audioEnabled || !soundType) return;
+            
+            const sound = soundEffects[soundType];
+            
+            if (sound) {
+                sound.currentTime = 0; // Reset to start
+                sound.play().catch(e => console.log('Audio play failed:', e));
+            } else {
+                console.log('Sound not found:', soundType);
+            }
+        }
+
+        // Initialize audio
+        function initAudio() {
+            // Initialize background music
+            bgMusic = document.getElementById('bgMusic');
+            if (bgMusic) bgMusic.volume = 0.3;
+            
+            // Initialize all sound effects from config
+            Object.keys(soundConfig).forEach(soundName => {
+                const audioElement = document.getElementById(soundName + 'Sound');
+                if (audioElement) {
+                    soundEffects[soundName] = audioElement;
+                    audioElement.volume = soundConfig[soundName].volume;
+                }
+            });
+        }
+
+        // Start background music
+        function startBackgroundMusic() {
+            if (!gameState.audioEnabled) return;
+            
+            if (bgMusic) {
+                bgMusic.play().catch(e => {
+                    console.log('Background music autoplay prevented:', e);
+                    // User interaction required for autoplay
+                });
+            }
+        }
+
+        // Toggle audio on/off
+        function toggleAudio() {
+            gameState.audioEnabled = !gameState.audioEnabled;
+            const button = document.getElementById('audioToggle');
+            
+            if (gameState.audioEnabled) {
+                button.textContent = '🔊';
+                button.classList.remove('muted');
+                if (bgMusic) bgMusic.play();
+            } else {
+                button.textContent = '🔇';
+                button.classList.add('muted');
+                if (bgMusic) bgMusic.pause();
+            }
+        }
+
+        // Open overlay with close-up image
+        function openOverlay(imageSrc) {
+            const overlay = document.getElementById('imageOverlay');
+            const overlayImage = document.getElementById('overlayImage');
+            overlayImage.src = imageSrc;
+            overlay.classList.add('active');
+        }
+
+        // Close overlay and return to scene
+        function closeOverlay() {
+            const overlay = document.getElementById('imageOverlay');
+            overlay.classList.remove('active');
+            playSound(hotspot.sound);
+        }
+
+        // Update inventory display
+        function updateInventory() {
+            const inventoryItems = document.getElementById('inventoryItems');
+            const decisionCount = document.getElementById('decisionCount');
+            
+            if (gameState.inventory.length === 0 || (gameState.inventory.length === 1 && gameState.inventory[0] === '')) {
+                inventoryItems.textContent = 'Empty';
+            } else {
+                inventoryItems.textContent = gameState.inventory.filter(item => item !== '').join(', ');
+            }
+            
+            decisionCount.textContent = gameState.decisionCount;
+        }
+
+        // Start the game
+        function startGame() {
+            const titleScreen = document.getElementById('titleScreen');
+            const blackScreen = document.getElementById('blackScreen');
+            
+            // Initialize audio
+            initAudio();
+            
+            titleScreen.classList.add('hidden');
+            
+            setTimeout(() => {
+                blackScreen.classList.add('active');
+            }, 500);
+            
+            setTimeout(() => {
+                loadScene('plane');
+                blackScreen.classList.remove('active');
+                // Start background music after user interaction
+                startBackgroundMusic();
+            }, 1000);
+        }
+
+        // Debug mode toggle
+        function toggleDebugMode() {
+            const container = document.getElementById('gameContainer');
+            const mousePos = document.getElementById('mousePosition');
+            
+            container.classList.toggle('debug-mode');
+            mousePos.classList.toggle('active');
+        }
+
+        // Track mouse position for hotspot placement
+        document.addEventListener('mousemove', function(e) {
+            const mousePos = document.getElementById('mousePosition');
+            if (!mousePos.classList.contains('active')) return;
+            
+            const container = document.getElementById('gameContainer');
+            const rect = container.getBoundingClientRect();
+            
+            // Calculate percentage position relative to container
+            const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+            const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+            
+            document.getElementById('mouseX').textContent = x;
+            document.getElementById('mouseY').textContent = y;
         });
 
-        // ✅ Update inventory display if applicable
-        if (typeof updateInventory === 'function') updateInventory();
-    }, 300);
-}
-
-
-
-function makeChoice(choice) {
-    // Increment decision counter
-    gameState.decisionCount++;
-    
-    // Check if special event should trigger
-    if (gameState.decisionCount === 50 && choice.next !== 'specialEvent') {
-        loadScene('specialEvent');
-        return;
-    }
-    
-    // Add item to inventory if choice has one
-    if (choice.item && !gameState.inventory.includes(choice.item)) {
-        gameState.inventory.push(choice.item);
-    }
-    
-    // Load next scene
-    loadScene(choice.next);
-}
-
-// Update inventory display
-function updateInventory() {
-    const inventoryItems = document.getElementById('inventoryItems');
-    if (gameState.inventory.length === 0) {
-        inventoryItems.textContent = 'Empty';
-    } else {
-        inventoryItems.textContent = gameState.inventory.join(', ');
-    }
-}
-
-// Start the game (called from title screen)
-function startGame() {
-    const titleScreen = document.getElementById('titleScreen');
-    const blackScreen = document.getElementById('blackScreen');
-    
-    // Hide title screen
-    titleScreen.classList.add('hidden');
-    
-    // Show black screen
-    setTimeout(() => {
-        blackScreen.classList.add('active');
-    }, 500);
-    
-    // Start first scene after black screen
-    setTimeout(() => {
-        loadScene('intro');
-        blackScreen.classList.remove('active');
-    }, 1000);
-}
+        // Click to copy coordinates
+        document.getElementById('mousePosition').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const x = document.getElementById('mouseX').textContent;
+            const y = document.getElementById('mouseY').textContent;
+            const text = `x: ${x}, y: ${y}`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const hint = this.querySelector('div:last-child');
+                hint.textContent = 'Copied!';
+                setTimeout(() => {
+                    hint.textContent = 'Click to copy';
+                }, 1000);
+            });
+        });
