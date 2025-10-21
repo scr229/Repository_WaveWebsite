@@ -1,637 +1,775 @@
-       // Game state
-        let gameState = {
-            currentScene: 'plane',
-            inventory: ['seen'],
-            decisionCount: 0,
-            audioEnabled: true
-        };
+// Game state
+let gameState = {
+    currentScene: 'plane',
+    inventory: ['seen', 'buoy'],
+    decisionCount: 0,
+    audioEnabled: true
+};
 
-        // Audio elements
-        let bgMusic;
-        let soundEffects = {};  // Store all sound effects here
+// Audio elements
+let bgMusic;
+let soundEffects = {};  // Store all sound effects here
 
-        // Sound effect configuration
-        const soundConfig = {
-            step: { volume: 0.5 },
-            item: { volume: 0.6 },
-            door: { volume: 0.7 },
-            splash: { volume: 0.4 },
-            switch: { volume: 0.8 },
-            metalstep: { volume: 0.8 },
-            paper: { volume: 0.3 },
-            metalsqueak: { volume: 0.5 },
-        };
+// Sound effect configuration
+const soundConfig = {
+    step: { volume: 0.5 },
+    item: { volume: 0.6 },
+    door: { volume: 0.7 },
+    splash: { volume: 0.4 },
+    switch: { volume: 0.8 },
+    metalstep: { volume: 0.8 },
+    paper: { volume: 0.3 },
+    metalsqueak: { volume: 0.5 },
+};
 
-        // Scene definitions with hotspots
-        const scenes = {
-            plane: {
-                title: 'Crash Site',
-                images: {
-                    default: 'Photos/Render_plane.png',
-                    stage2: 'Photos/Render_plane.png',
-                    stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 50,
-                        y: 79,
-                        width: 2.7,
-                        height: 5.5,
-                        type: 'inspect',
-                        inspectImage: 'Photos/Render_Phone_Dead_single.png',
-                        item: null,
-                        sound: 'switch'
-                    },
-                    {
-                        x: 50,
-                        y: 37,
-                        width: 10,
-                        height: 11,
-                        next: 'intro',
-                        item: null,
-                        sound: 'step'
-                    }
-                ]
+// Scene definitions with hotspots
+const scenes = {
+    plane: {
+        title: 'Crash Site',
+        images: {
+            default: 'Photos/Render_plane.png',
+            stage2: 'Photos/Render_plane.png',
+            stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
+        },
+        hotspots: [
+            {
+                x: 50,
+                y: 79,
+                width: 2.7,
+                height: 5.5,
+                type: 'inspect',
+                inspectImage: 'Photos/Render_Phone_Dead_single.png',
+                item: null,
+                sound: 'switch'
             },
-            intro: {
-                title: 'Approach',
-                images: {
-                    default: 'Photos/Render_Approach.png',
-                    stage2: 'Photos/Render_Approach_rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 57,
-                        y: 69,
-                        width: 3,
-                        height: 4,
-                        type: 'inspect',
-                        inspectImage: 'Photos/Battery_diagram.png',
-                        item: null,
-                        sound: 'paper'
-                    },
-                    {
-                        x: 31,      // % from left
-                        y: 39,      // % from top
-                        width: 14,  // % width
-                        height: 19, // % height
-                        next: 'front',
-                        item: null,
-                        sound: 'step'  // Sound effect to play
-                    },
-                    {
-                        x: 46,      // % from left
-                        y: 50,      // % from top
-                        width: 9,  // % width
-                        height: 8, // % height
-                        next: 'beach',
-                        item: null,
-                        sound: 'step'  // Sound effect to play
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'plane',
-                        item: null,
-                        sound: 'step'
-                    }
-                ]
+            {
+                x: 50,
+                y: 37,
+                width: 10,
+                height: 11,
+                next: 'intro',
+                item: null,
+                sound: 'step'
+            }
+        ]
+    },
+    intro: {
+        title: 'Approach',
+        images: {
+            default: 'Photos/Render_Approach.png',
+            stage2: 'Photos/Render_Approach_rain.png',
+            stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
+        },
+        hotspots: [
+            {
+                x: 57,
+                y: 69,
+                width: 3,
+                height: 4,
+                type: 'inspect',
+                inspectImage: 'Photos/Battery_diagram.png',
+                item: null,
+                sound: 'paper'
             },
-            front: {
-                title: 'Front',
-                images: {
-                    default: 'Photos/Render_Front.png',
-                    stage2: 'Photos/Render_Front_Rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 41,
-                        y: 55,
-                        width: 15,
-                        height: 20,
-                        next: 'ground',
-                        item: null,
-                        sound: 'step'
-                    },
-                    {
-                        x: 56,
-                        y: 74,
-                        width: 11,
-                        height: 15,
-                        next: 'grass',
-                        item: null,
-                        condition: () => gameState.inventory.includes('seen'),
-                        sound: 'step'
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'intro',
-                        item: null,
-                        sound: 'step'
-                    }
-                ]
+            {
+                x: 31,
+                y: 39,
+                width: 14,
+                height: 19,
+                next: 'front',
+                item: null,
+                sound: 'step'
             },
-            ground: {
-                title: 'Ground Level',
-                images: {
-                    default: 'Photos/Render_Ground.png',
-                    stage2: 'Photos/Render_Ground_rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 41.5,
-                        y: 54,
-                        width: 10,
-                        height: 18.5,
-                        next: 'secondfloor',
-                        item: null,
-                        sound: 'metalstep'
-                    },
-                    {
-                        x: 35,
-                        y: 46,
-                        width: 5,
-                        height: 4,
-                        type: 'inspect',
-                        inspectImage: 'Photos/Section_Crumpled.png',
-                        item: null,
-                        sound: 'paper'
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'front',
-                        item: null,
-                        sound: 'step'
-                    }
-                ]
+            {
+                x: 46,
+                y: 50,
+                width: 9,
+                height: 8,
+                next: 'beach',
+                item: null,
+                sound: 'step'
             },
-            secondfloor: {
-                title: 'Second Floor',
-                images: {
-                    default: 'Photos/Render_2nd_Off.png',
-                    stage2: 'Photos/Render_2nd_Off_rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 35,
-                        y: 46,
-                        width: 20,
-                        height: 21,
-                        next: 'thirdfloor',
-                        item: null,
-                        sound: 'metalstep'
-                    },
-                    {
-                        x: 60,
-                        y: 31,
-                        width: 6,
-                        height: 65,
-                        next: 'servers',
-                        item: null,
-                        sound: 'metalsqueak'
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'ground',
-                        item: null,
-                        sound: 'metalstep'
-                    }
-                ]
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'plane',
+                item: null,
+                sound: 'step'
+            }
+        ]
+    },
+    front: {
+        title: 'Front',
+        images: {
+            default: 'Photos/Render_Front.png',
+            stage2: 'Photos/Render_Front_Rain.png',
+            stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
+        },
+        hotspots: [
+            {
+                x: 41,
+                y: 55,
+                width: 15,
+                height: 20,
+                next: 'ground',
+                item: null,
+                sound: 'step'
             },
-            servers: {
-                title: 'Battery Room',
-                images: {
-                    default: 'Photos/Render_Servers_Off.png',
-                    stage2: 'Photos/Render_Servers_Off.png',
-                    stage3: 'Photos/Render_Servers_Off.png'
-                },
-                hotspots: [
-                    {
-                        x: 45,
-                        y: 50,
-                        width: 10,
-                        height: 15,
-                        next: 'servers',
-                        item: 'PowerOn',
-                        condition: () => gameState.inventory.includes('BuoyPlaced'),
-                        sound: 'item'
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'secondfloor',
-                        item: null,
-                        sound: 'metalstep'
-                    }
-                ]
+            {
+                x: 56,
+                y: 74,
+                width: 11,
+                height: 15,
+                next: 'grass',
+                item: null,
+                condition: () => gameState.inventory.includes('seen'),
+                sound: 'step'
             },
-            thirdfloor: {
-                title: 'Third Floor',
-                images: {
-                    default: 'Photos/Render_3rd.png',
-                    stage2: 'Photos/Render_3rd_rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 31,
-                        y: 61,
-                        width: 14,
-                        height: 17,
-                        next: 'lookout',
-                        item: null,
-                        sound: 'metalstep'
-                    },
-                    {
-                        x: 44,
-                        y: 19,
-                        width: 2.5,
-                        height: 3,
-                        type: 'inspect',
-                        inspectImage: 'Photos/axo_drawing.png',
-                        item: null,
-                        sound: 'paper'
-                    },
-                    {
-                        x: 55,
-                        y: 66,
-                        width: 13,
-                        height: 34,
-                        next: 'secondfloor',
-                        item: null,
-                        sound: 'metalstep'
-                    }
-                ]
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'intro',
+                item: null,
+                sound: 'step'
+            }
+        ]
+    },
+    ground: {
+        title: 'Ground Level',
+        images: {
+            default: 'Photos/Render_Ground.png',
+            stage2: 'Photos/Render_Ground_rain.png',
+            stage3: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
+        },
+        hotspots: [
+            {
+                x: 41.5,
+                y: 54,
+                width: 10,
+                height: 18.5,
+                next: 'secondfloor',
+                item: null,
+                sound: 'metalstep'
             },
-            lookout: {
-                title: 'Lookout',
-                images: {
-                    default: gameState.inventory.includes('buoyPlaced') 
-                            ? 'Photos/Render_Lookout.png'
-                            : 'Photos/Render_Lookout_gone.png',
-                    stage2: gameState.inventory.includes('buoyPlaced') 
-                            ? 'Photos/Render_Lookout.png'
-                            : 'Photos/Render_Lookout_gone.png',
-                    stage3: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 34,
-                        y: 36,
-                        width: 15,
-                        height: 29,
-                        next: 'lookout',
-                        type: 'inspect',
-                        item: 'seen',
-                        inspectImage: 'Photos/Render_Buoy_Telescope.png',
-                        condition: () => !gameState.inventory.includes('buoyPlaced'),
-                        condition: () => !gameState.inventory.includes('buoy'),
-                        sound: 'metalsqueak'
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'thirdfloor',
-                        item: null,
-                        sound: 'metalstep'
-                    }
-                ]
+            {
+                x: 35,
+                y: 46,
+                width: 5,
+                height: 4,
+                type: 'inspect',
+                inspectImage: 'Photos/Section_Crumpled.png',
+                item: null,
+                sound: 'paper'
             },
-            beach: {
-                title: 'Beach',
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'front',
+                item: null,
+                sound: 'step'
+            }
+        ]
+    },
+    secondfloor: {
+        title: 'Second Floor',
+        images: {
+            default: 'Photos/Render_2nd_Off.png',
+            stage2: 'Photos/Render_2nd_Off_rain.png',
+            stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
+        },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('PowerOn'),
                 images: {
-                    default: 'Photos/Render_Beach.png',
-                    stage2: 'Photos/Render_Beach_rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1610375229632-c4a8e1ec07fa?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 52,
-                        y: 57,
-                        width: 6,
-                        height: 4,
-                        next: 'ocean',
-                        item: null,
-                        sound: 'splash'
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'intro',
-                        item: null,
-                        sound: 'step'
-                    }
-                ]
+                    default: 'Photos/Render_2nd_On.png',
+                    stage2: 'Photos/Render_2nd_On_rain.png',
+                    stage3: 'Photos/Render_2nd_On.png'
+                }
+            }
+        ],
+        hotspots: [
+            {
+                x: 35,
+                y: 46,
+                width: 20,
+                height: 21,
+                next: 'thirdfloor',
+                item: null,
+                sound: 'metalstep'
             },
-            grass: {
-                title: 'Grass',
-                images: {
-                    default: gameState.inventory.includes('buoy') 
-                            ? 'Photos/Render_Buoy_Grass_none.png'
-                            : 'Photos/Render_Buoy_Grass.png',
-                    stage2: gameState.inventory.includes('buoy') 
-                            ? 'Photos/Render_Buoy_Grass_none_rain.png'
-                            : 'Photos/Render_Buoy_Grass_rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 39,
-                        y: 26,
-                        width: 13,
-                        height: 47,
-                        next: 'grass',
-                        item: 'buoy',
-                        condition: () => !gameState.inventory.includes('buoy'),
-                        sound: 'metalstep'
-                    },
-                    {
-                        x: 30,
-                        y: 91,
-                        width: 38,
-                        height: 9,
-                        next: 'front',
-                        item: null,
-                        sound: 'step'
-                    }
-                ]
+            {
+                x: 60,
+                y: 31,
+                width: 6,
+                height: 65,
+                next: 'servers',
+                item: null,
+                sound: 'metalsqueak'
             },
-            ocean: {
-                title: 'Ocean',
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'ground',
+                item: null,
+                sound: 'metalstep'
+            }
+        ]
+    },
+    servers: {
+        title: 'Battery Room',
+        images: {
+            default: 'Photos/Render_Servers_Off.png',
+            stage2: 'Photos/Render_Servers_Off.png',
+            stage3: 'Photos/Render_Servers_Off.png'
+        },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('PowerOn'),
                 images: {
-                    default: 'Photos/Render_Buoy_none.png',
+                    default: 'Photos/Render_Servers_On.png',
+                    stage2: 'Photos/Render_Servers_On.png',
+                    stage3: 'Photos/Render_Servers_On.png'
+                }
+            }
+        ],
+        hotspots: [
+            {
+                x: 45,
+                y: 50,
+                width: 10,
+                height: 15,
+                type: 'password',
+                password: '1234',
+                item: 'PowerOn',
+                condition: () => gameState.inventory.includes('buoyPlaced') && !gameState.inventory.includes('PowerOn'),
+                sound: 'switch'
+            },
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'secondfloor',
+                item: null,
+                sound: 'metalstep'
+            }
+        ]
+    },
+    thirdfloor: {
+        title: 'Third Floor',
+        images: {
+            default: 'Photos/Render_3rd.png',
+            stage2: 'Photos/Render_3rd_rain.png',
+            stage3: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=800'
+        },
+        hotspots: [
+            {
+                x: 31,
+                y: 61,
+                width: 14,
+                height: 17,
+                next: 'lookout',
+                item: null,
+                sound: 'metalstep'
+            },
+            {
+                x: 44,
+                y: 19,
+                width: 2.5,
+                height: 3,
+                type: 'inspect',
+                inspectImage: 'Photos/axo_drawing.png',
+                item: null,
+                sound: 'paper'
+            },
+            {
+                x: 55,
+                y: 66,
+                width: 13,
+                height: 34,
+                next: 'secondfloor',
+                item: null,
+                sound: 'metalstep'
+            }
+        ]
+    },
+    lookout: {
+        title: 'Lookout',
+        images: {
+            default: 'Photos/Render_Lookout_gone.png',
+            stage2: 'Photos/Render_Lookout_gone.png',
+            stage3: 'Photos/Render_Lookout_gone.png'
+        },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('buoyPlaced'),
+                images: {
+                    default: 'Photos/Render_Lookout.png',
+                    stage2: 'Photos/Render_Lookout.png',
+                    stage3: 'Photos/Render_Lookout.png'
+                }
+            }
+        ],
+        hotspots: [
+            {
+                x: 34,
+                y: 36,
+                width: 15,
+                height: 29,
+                type: 'inspect',
+                item: 'seen',
+                inspectImage: 'Photos/Render_Buoy_Telescope.png',
+                condition: () => !gameState.inventory.includes('buoyPlaced') && !gameState.inventory.includes('buoy'),
+                sound: 'metalsqueak'
+            },
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'thirdfloor',
+                item: null,
+                sound: 'metalstep'
+            }
+        ]
+    },
+    beach: {
+        title: 'Beach',
+        images: {
+            default: 'Photos/Render_Beach.png',
+            stage2: 'Photos/Render_Beach_rain.png',
+            stage3: 'https://images.unsplash.com/photo-1610375229632-c4a8e1ec07fa?w=800'
+        },
+        hotspots: [
+            {
+                x: 52,
+                y: 57,
+                width: 6,
+                height: 4,
+                next: 'ocean',
+                item: null,
+                sound: 'splash'
+            },
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'intro',
+                item: null,
+                sound: 'step'
+            }
+        ]
+    },
+    grass: {
+        title: 'Grass',
+        images: {
+            default: 'Photos/Render_Buoy_Grass.png',
+            stage2: 'Photos/Render_Buoy_Grass_rain.png',
+            stage3: 'Photos/Render_Buoy_Grass.png'
+        },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('buoy'),
+                images: {
+                    default: 'Photos/Render_Buoy_Grass_none.png',
+                    stage2: 'Photos/Render_Buoy_Grass_none_rain.png',
+                    stage3: 'Photos/Render_Buoy_Grass_none.png'
+                }
+            }
+        ],
+        hotspots: [
+            {
+                x: 39,
+                y: 26,
+                width: 13,
+                height: 47,
+                next: 'grass',
+                item: 'buoy',
+                condition: () => !gameState.inventory.includes('buoy'),
+                sound: 'metalstep'
+            },
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'front',
+                item: null,
+                sound: 'step'
+            }
+        ]
+    },
+    ocean: {
+        title: 'Ocean',
+        images: {
+            default: 'Photos/Render_Buoy_none.png',
+            stage2: 'Photos/Render_Buoy_none_rain.png',
+            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+        },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('buoyPlaced'),
+                images: {
+                    default: 'Photos/Render_Buoy.png',
                     stage2: 'Photos/Render_Buoy_rain.png',
-                    stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
-                },
-                hotspots: [
-                    {
-                        x: 40,
-                        y: 40,
-                        width: 20,
-                        height: 30,
-                        next: 'beach',
-                        item: null,
-                        sound: 'click'
-                    }
-                ]
+                    stage3: 'Photos/Render_Buoy.png'
+                }
+            }
+        ],
+        hotspots: [
+            {
+                x: 40,
+                y: 40,
+                width: 20,
+                height: 30,
+                next: 'ocean',
+                item: 'buoyPlaced',
+                condition: () => gameState.inventory.includes('buoy') && !gameState.inventory.includes('buoyPlaced'),
+                sound: 'splash'
+            },
+            {
+                x: 30,
+                y: 91,
+                width: 38,
+                height: 9,
+                next: 'beach',
+                item: null,
+                sound: 'splash'
+            }
+        ]
+    },
+    win1: {
+        title: 'waves',
+        images: {
+            default: 'Photos/Render_Waves.png',
+            stage2: 'Photos/Render_Waves.png',
+            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+        },
+        hotspots: [
+            {
+                x: 31,
+                y: 0,
+                width: 68,
+                height: 100,
+                next: 'win2',
+            }
+        ]
+    },
+    win2: {
+        title: 'flood',
+        images: {
+            default: 'Photos/Render_Storm_Won.png',
+            stage2: 'Photos/Render_Waves.png',
+            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+        },
+        hotspots: [
+            {
+                x: 31,
+                y: 0,
+                width: 68,
+                height: 100,
+                next: 'winscreen',
+            }
+        ]
+    },
+    lose1: {
+        title: 'waves',
+        images: {
+            default: 'Photos/Render_Waves.png',
+            stage2: 'Photos/Render_Waves.png',
+            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+        },
+        hotspots: [
+            {
+                x: 31,
+                y: 0,
+                width: 68,
+                height: 100,
+                next: 'lose2',
+            }
+        ]
+    },
+    lose2: {
+        title: 'storm',
+        images: {
+            default: 'Photos/Render_Storm_Lost.png',
+            stage2: 'Photos/Render_Storm_Lost.png',
+            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+        },
+        hotspots: [
+            {
+                x: 31,
+                y: 0,
+                width: 68,
+                height: 100,
+                next: 'losescreen',
+            }
+        ]
+    }
+};
+
+// Get the correct image based on decision count AND inventory
+function getSceneImage(scene) {
+    let imageStage;
+    
+    // Determine which stage based on decision count
+    if (gameState.decisionCount >= 100) {
+        imageStage = 'stage3';
+    } else if (gameState.decisionCount >= 20) {
+        imageStage = 'stage2';
+    } else {
+        imageStage = 'default';
+    }
+    
+    // Check if scene has conditional images based on inventory
+    if (scene.conditionalImages) {
+        for (let condition of scene.conditionalImages) {
+            if (condition.check()) {
+                return condition.images[imageStage] || condition.images.default;
+            }
+        }
+    }
+    
+    // Return normal stage image
+    return scene.images[imageStage];
+}
+
+// Load a scene
+function loadScene(sceneKey) {
+    gameState.currentScene = sceneKey;
+    const scene = scenes[sceneKey];
+    
+    const img = document.getElementById('gameImage');
+    img.classList.add('fade-out');
+    
+    setTimeout(() => {
+        // Update image
+        img.src = getSceneImage(scene);
+        img.classList.remove('fade-out');
+        
+        // Render hotspots
+        renderHotspots(scene);
+        
+        // Update inventory display
+        updateInventory();
+    }, 300);
+}
+
+// Render hotspots for current scene
+function renderHotspots(scene) {
+    const container = document.getElementById('hotspotsContainer');
+    container.innerHTML = '';
+    
+    if (!scene.hotspots) return;
+    
+    scene.hotspots.forEach((hotspot, index) => {
+        // Check condition if exists
+        if (hotspot.condition && !hotspot.condition()) {
+            return; // Skip this hotspot
+        }
+        
+        const hotspotDiv = document.createElement('div');
+        hotspotDiv.className = 'hotspot';
+        hotspotDiv.style.left = hotspot.x + '%';
+        hotspotDiv.style.top = hotspot.y + '%';
+        hotspotDiv.style.width = hotspot.width + '%';
+        hotspotDiv.style.height = hotspot.height + '%';
+        
+        hotspotDiv.onclick = () => {
+            if (hotspot.type === 'inspect') {
+                openOverlay(hotspot.inspectImage);
+                playSound(hotspot.sound);
+                // Add item if inspect has one
+                if (hotspot.item && !gameState.inventory.includes(hotspot.item)) {
+                    gameState.inventory.push(hotspot.item);
+                    updateInventory();
+                }
+            } else {
+                makeChoice(hotspot);
             }
         };
+        
+        container.appendChild(hotspotDiv);
+    });
+}
 
-        // Get the correct image based on decision count
-        function getSceneImage(scene) {
-            if (gameState.decisionCount >= 100) {
-                return scene.images.stage3;
-            } else if (gameState.decisionCount >= 20) {
-                return scene.images.stage2;
-            } else {
-                return scene.images.default;
-            }
+// Handle hotspot click
+function makeChoice(hotspot) {
+    // Play sound effect
+    playSound(hotspot.sound);
+    
+    // Increment decision counter
+    gameState.decisionCount++;
+    
+    // Check if special event should trigger
+    if (gameState.decisionCount === 22 && choice.next !== 'win1' && !gameState.inventory.includes('PowerOn')) {
+        loadScene('win1');
+        return;
+    }
+    
+    // Add item to inventory if hotspot has one
+    if (hotspot.item && !gameState.inventory.includes(hotspot.item)) {
+        gameState.inventory.push(hotspot.item);
+    }
+    
+    // Load next scene
+    loadScene(hotspot.next);
+}
+
+// Play sound effect
+function playSound(soundType) {
+    if (!gameState.audioEnabled || !soundType) return;
+    
+    const sound = soundEffects[soundType];
+    
+    if (sound) {
+        sound.currentTime = 0; // Reset to start
+        sound.play().catch(e => console.log('Audio play failed:', e));
+    } else {
+        console.log('Sound not found:', soundType);
+    }
+}
+
+// Initialize audio
+function initAudio() {
+    // Initialize background music
+    bgMusic = document.getElementById('bgMusic');
+    if (bgMusic) bgMusic.volume = 0.3;
+    
+    // Initialize all sound effects from config
+    Object.keys(soundConfig).forEach(soundName => {
+        const audioElement = document.getElementById(soundName + 'Sound');
+        if (audioElement) {
+            soundEffects[soundName] = audioElement;
+            audioElement.volume = soundConfig[soundName].volume;
         }
+    });
+}
 
-        // Load a scene
-        function loadScene(sceneKey) {
-            gameState.currentScene = sceneKey;
-            const scene = scenes[sceneKey];
-            
-            const img = document.getElementById('gameImage');
-            img.classList.add('fade-out');
-
-                // Check if special event should trigger
-            if (gameState.decisionCount === 22 && choice.next !== 'specialEvent') {
-                loadScene('specialEvent');
-                return;
-            }
-            
-            setTimeout(() => {
-                // Update image
-                img.src = getSceneImage(scene);
-                img.classList.remove('fade-out');
-                
-                // Render hotspots
-                renderHotspots(scene);
-                
-                // Update inventory display
-                updateInventory();
-            }, 300);
-        }
-
-        // Render hotspots for current scene
-        function renderHotspots(scene) {
-            const container = document.getElementById('hotspotsContainer');
-            container.innerHTML = '';
-            
-            if (!scene.hotspots) return;
-            
-            scene.hotspots.forEach((hotspot, index) => {
-                // Check condition if exists
-                if (hotspot.condition && !hotspot.condition()) {
-                    return; // Skip this hotspot
-                }
-                
-                const hotspotDiv = document.createElement('div');
-                hotspotDiv.className = 'hotspot';
-                hotspotDiv.style.left = hotspot.x + '%';
-                hotspotDiv.style.top = hotspot.y + '%';
-                hotspotDiv.style.width = hotspot.width + '%';
-                hotspotDiv.style.height = hotspot.height + '%';
-                
-                hotspotDiv.onclick = () => {
-                    if (hotspot.type === 'inspect') {
-                        openOverlay(hotspot.inspectImage);
-                        playSound(hotspot.sound);
-                    } else {
-                        makeChoice(hotspot);
-                    }
-                };
-                
-                container.appendChild(hotspotDiv);
-            });
-        }
-
-        // Handle hotspot click
-        function makeChoice(hotspot) {
-            // Play sound effect
-            playSound(hotspot.sound);
-            
-            // Increment decision counter
-            gameState.decisionCount++;
-            
-            // Add item to inventory if hotspot has one
-            if (hotspot.item && !gameState.inventory.includes(hotspot.item)) {
-                gameState.inventory.push(hotspot.item);
-            }
-            
-            // Load next scene
-            loadScene(hotspot.next);
-        }
-
-        // Play sound effect
-        function playSound(soundType) {
-            if (!gameState.audioEnabled || !soundType) return;
-            
-            const sound = soundEffects[soundType];
-            
-            if (sound) {
-                sound.currentTime = 0; // Reset to start
-                sound.play().catch(e => console.log('Audio play failed:', e));
-            } else {
-                console.log('Sound not found:', soundType);
-            }
-        }
-
-        // Initialize audio
-        function initAudio() {
-            // Initialize background music
-            bgMusic = document.getElementById('bgMusic');
-            if (bgMusic) bgMusic.volume = 0.3;
-            
-            // Initialize all sound effects from config
-            Object.keys(soundConfig).forEach(soundName => {
-                const audioElement = document.getElementById(soundName + 'Sound');
-                if (audioElement) {
-                    soundEffects[soundName] = audioElement;
-                    audioElement.volume = soundConfig[soundName].volume;
-                }
-            });
-        }
-
-        // Start background music
-        function startBackgroundMusic() {
-            if (!gameState.audioEnabled) return;
-            
-            if (bgMusic) {
-                bgMusic.play().catch(e => {
-                    console.log('Background music autoplay prevented:', e);
-                    // User interaction required for autoplay
-                });
-            }
-        }
-
-        // Toggle audio on/off
-        function toggleAudio() {
-            gameState.audioEnabled = !gameState.audioEnabled;
-            const button = document.getElementById('audioToggle');
-            
-            if (gameState.audioEnabled) {
-                button.textContent = '🔊';
-                button.classList.remove('muted');
-                if (bgMusic) bgMusic.play();
-            } else {
-                button.textContent = '🔇';
-                button.classList.add('muted');
-                if (bgMusic) bgMusic.pause();
-            }
-        }
-
-        // Open overlay with close-up image
-        function openOverlay(imageSrc) {
-            const overlay = document.getElementById('imageOverlay');
-            const overlayImage = document.getElementById('overlayImage');
-            overlayImage.src = imageSrc;
-            overlay.classList.add('active');
-        }
-
-        // Close overlay and return to scene
-        function closeOverlay() {
-            const overlay = document.getElementById('imageOverlay');
-            overlay.classList.remove('active');
-            playSound(hotspot.sound);
-        }
-
-        // Update inventory display
-        function updateInventory() {
-            const inventoryItems = document.getElementById('inventoryItems');
-            const decisionCount = document.getElementById('decisionCount');
-            
-            if (gameState.inventory.length === 0 || (gameState.inventory.length === 1 && gameState.inventory[0] === '')) {
-                inventoryItems.textContent = 'Empty';
-            } else {
-                inventoryItems.textContent = gameState.inventory.filter(item => item !== '').join(', ');
-            }
-            
-            decisionCount.textContent = gameState.decisionCount;
-        }
-
-        // Start the game
-        function startGame() {
-            const titleScreen = document.getElementById('titleScreen');
-            const blackScreen = document.getElementById('blackScreen');
-            
-            // Initialize audio
-            initAudio();
-            
-            titleScreen.classList.add('hidden');
-            
-            setTimeout(() => {
-                blackScreen.classList.add('active');
-            }, 500);
-            
-            setTimeout(() => {
-                loadScene('plane');
-                blackScreen.classList.remove('active');
-                // Start background music after user interaction
-                startBackgroundMusic();
-            }, 1000);
-        }
-
-        // Debug mode toggle
-        function toggleDebugMode() {
-            const container = document.getElementById('gameContainer');
-            const mousePos = document.getElementById('mousePosition');
-            
-            container.classList.toggle('debug-mode');
-            mousePos.classList.toggle('active');
-        }
-
-        // Track mouse position for hotspot placement
-        document.addEventListener('mousemove', function(e) {
-            const mousePos = document.getElementById('mousePosition');
-            if (!mousePos.classList.contains('active')) return;
-            
-            const container = document.getElementById('gameContainer');
-            const rect = container.getBoundingClientRect();
-            
-            // Calculate percentage position relative to container
-            const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-            const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-            
-            document.getElementById('mouseX').textContent = x;
-            document.getElementById('mouseY').textContent = y;
+// Start background music
+function startBackgroundMusic() {
+    if (!gameState.audioEnabled) return;
+    
+    if (bgMusic) {
+        bgMusic.play().catch(e => {
+            console.log('Background music autoplay prevented:', e);
+            // User interaction required for autoplay
         });
+    }
+}
 
-        // Click to copy coordinates
-        document.getElementById('mousePosition').addEventListener('click', function(e) {
-            e.stopPropagation();
-            const x = document.getElementById('mouseX').textContent;
-            const y = document.getElementById('mouseY').textContent;
-            const text = `x: ${x}, y: ${y}`;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const hint = this.querySelector('div:last-child');
-                hint.textContent = 'Copied!';
-                setTimeout(() => {
-                    hint.textContent = 'Click to copy';
-                }, 1000);
-            });
-        });
+// Toggle audio on/off
+function toggleAudio() {
+    gameState.audioEnabled = !gameState.audioEnabled;
+    const button = document.getElementById('audioToggle');
+    
+    if (gameState.audioEnabled) {
+        button.textContent = '🔊';
+        button.classList.remove('muted');
+        if (bgMusic) bgMusic.play();
+    } else {
+        button.textContent = '🔇';
+        button.classList.add('muted');
+        if (bgMusic) bgMusic.pause();
+    }
+}
+
+// Open overlay with close-up image
+function openOverlay(imageSrc) {
+    const overlay = document.getElementById('imageOverlay');
+    const overlayImage = document.getElementById('overlayImage');
+    overlayImage.src = imageSrc;
+    overlay.classList.add('active');
+}
+
+// Close overlay and return to scene
+function closeOverlay() {
+    const overlay = document.getElementById('imageOverlay');
+    overlay.classList.remove('active');
+}
+
+// Update inventory display
+function updateInventory() {
+    const inventoryItems = document.getElementById('inventoryItems');
+    const decisionCount = document.getElementById('decisionCount');
+    
+    if (gameState.inventory.length === 0 || (gameState.inventory.length === 1 && gameState.inventory[0] === '')) {
+        inventoryItems.textContent = 'Empty';
+    } else {
+        inventoryItems.textContent = gameState.inventory.filter(item => item !== '').join(', ');
+    }
+    
+    decisionCount.textContent = gameState.decisionCount;
+}
+
+// Start the game
+function startGame() {
+    const titleScreen = document.getElementById('titleScreen');
+    const blackScreen = document.getElementById('blackScreen');
+    
+    // Initialize audio
+    initAudio();
+    
+    titleScreen.classList.add('hidden');
+    
+    setTimeout(() => {
+        blackScreen.classList.add('active');
+    }, 500);
+    
+    setTimeout(() => {
+        loadScene('plane');
+        blackScreen.classList.remove('active');
+        // Start background music after user interaction
+        startBackgroundMusic();
+    }, 1000);
+}
+
+// Debug mode toggle
+function toggleDebugMode() {
+    const container = document.getElementById('gameContainer');
+    const mousePos = document.getElementById('mousePosition');
+    
+    container.classList.toggle('debug-mode');
+    mousePos.classList.toggle('active');
+}
+
+// Track mouse position for hotspot placement
+document.addEventListener('mousemove', function(e) {
+    const mousePos = document.getElementById('mousePosition');
+    if (!mousePos.classList.contains('active')) return;
+    
+    const container = document.getElementById('gameContainer');
+    const rect = container.getBoundingClientRect();
+    
+    // Calculate percentage position relative to container
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+    
+    document.getElementById('mouseX').textContent = x;
+    document.getElementById('mouseY').textContent = y;
+});
+
+// Click to copy coordinates
+document.getElementById('mousePosition').addEventListener('click', function(e) {
+    e.stopPropagation();
+    const x = document.getElementById('mouseX').textContent;
+    const y = document.getElementById('mouseY').textContent;
+    const text = `x: ${x}, y: ${y}`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        const hint = this.querySelector('div:last-child');
+        hint.textContent = 'Copied!';
+        setTimeout(() => {
+            hint.textContent = 'Click to copy';
+        }, 1000);
+    });
+});

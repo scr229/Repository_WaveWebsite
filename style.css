@@ -235,6 +235,9 @@
             font-family: "consolas", sans-serif;
         }
 
+
+        
+
                 /* Debug mode - shows all hotspots */
         .debug-mode .hotspot {
             background: rgba(255, 0, 0, 0.2);

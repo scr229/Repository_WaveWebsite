@@ -64,6 +64,26 @@
         <img id="overlayImage" class="overlay-image" src="" alt="Close-up">
     </div>
 
+    <!-- Password Input Overlay -->
+    <div class="overlay password-overlay" id="passwordOverlay">
+        <div class="password-container">
+            <div class="password-title">Enter Password</div>
+            <input 
+                type="text" 
+                id="passwordInput" 
+                class="password-input" 
+                placeholder="****"
+                maxlength="10"
+                autocomplete="off"
+            >
+            <div id="passwordError" class="password-error"></div>
+            <div class="password-buttons">
+                <button onclick="checkPassword()" class="password-btn password-btn-submit">Submit</button>
+                <button onclick="closePasswordPrompt()" class="password-btn password-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Audio Elements -->
     <audio id="bgMusic" loop>
         <source src="Audio/Background_waves.mp3" type="audio/mpeg">
