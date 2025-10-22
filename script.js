@@ -1,14 +1,15 @@
 // Game state
 let gameState = {
     currentScene: 'plane',
-    inventory: ['seen', 'buoy'],
+    inventory: ['buoyPlaced'],
     decisionCount: 0,
-    audioEnabled: true
+    audioEnabled: true,
+    passwordInput: ''
 };
 
 // Audio elements
 let bgMusic;
-let soundEffects = {};  // Store all sound effects here
+let soundEffects = {};
 
 // Sound effect configuration
 const soundConfig = {
@@ -20,9 +21,11 @@ const soundConfig = {
     metalstep: { volume: 0.8 },
     paper: { volume: 0.3 },
     metalsqueak: { volume: 0.5 },
+    correct: { volume: 0.7 },
+    incorrect: { volume: 0.7 }
 };
 
-// Scene definitions with hotspots
+// Scene definitions - Copy all your scenes from your file
 const scenes = {
     plane: {
         title: 'Crash Site',
@@ -242,16 +245,17 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 45,
+                x: 48,
                 y: 50,
-                width: 10,
-                height: 15,
+                width: 18,
+                height: 6,
                 type: 'password',
                 password: '1234',
                 item: 'PowerOn',
                 condition: () => gameState.inventory.includes('buoyPlaced') && !gameState.inventory.includes('PowerOn'),
                 sound: 'switch'
             },
+
             {
                 x: 30,
                 y: 91,
@@ -521,7 +525,6 @@ const scenes = {
 function getSceneImage(scene) {
     let imageStage;
     
-    // Determine which stage based on decision count
     if (gameState.decisionCount >= 100) {
         imageStage = 'stage3';
     } else if (gameState.decisionCount >= 20) {
@@ -530,7 +533,6 @@ function getSceneImage(scene) {
         imageStage = 'default';
     }
     
-    // Check if scene has conditional images based on inventory
     if (scene.conditionalImages) {
         for (let condition of scene.conditionalImages) {
             if (condition.check()) {
@@ -539,7 +541,6 @@ function getSceneImage(scene) {
         }
     }
     
-    // Return normal stage image
     return scene.images[imageStage];
 }
 
@@ -552,14 +553,9 @@ function loadScene(sceneKey) {
     img.classList.add('fade-out');
     
     setTimeout(() => {
-        // Update image
         img.src = getSceneImage(scene);
         img.classList.remove('fade-out');
-        
-        // Render hotspots
         renderHotspots(scene);
-        
-        // Update inventory display
         updateInventory();
     }, 300);
 }
@@ -572,9 +568,8 @@ function renderHotspots(scene) {
     if (!scene.hotspots) return;
     
     scene.hotspots.forEach((hotspot, index) => {
-        // Check condition if exists
         if (hotspot.condition && !hotspot.condition()) {
-            return; // Skip this hotspot
+            return;
         }
         
         const hotspotDiv = document.createElement('div');
@@ -588,11 +583,12 @@ function renderHotspots(scene) {
             if (hotspot.type === 'inspect') {
                 openOverlay(hotspot.inspectImage);
                 playSound(hotspot.sound);
-                // Add item if inspect has one
                 if (hotspot.item && !gameState.inventory.includes(hotspot.item)) {
                     gameState.inventory.push(hotspot.item);
                     updateInventory();
                 }
+            } else if (hotspot.type === 'password') {
+                openPasswordPrompt(hotspot);
             } else {
                 makeChoice(hotspot);
             }
@@ -604,25 +600,101 @@ function renderHotspots(scene) {
 
 // Handle hotspot click
 function makeChoice(hotspot) {
-    // Play sound effect
     playSound(hotspot.sound);
-    
-    // Increment decision counter
     gameState.decisionCount++;
     
-    // Check if special event should trigger
-    if (gameState.decisionCount === 22 && choice.next !== 'win1' && !gameState.inventory.includes('PowerOn')) {
+    if (gameState.decisionCount === 40 && !gameState.inventory.includes('PowerOn')) {
+        loadScene('lose1');
+        return;
+    }
+
+        if (gameState.decisionCount === 40 && gameState.inventory.includes('PowerOn')) {
         loadScene('win1');
         return;
     }
     
-    // Add item to inventory if hotspot has one
     if (hotspot.item && !gameState.inventory.includes(hotspot.item)) {
         gameState.inventory.push(hotspot.item);
     }
     
-    // Load next scene
     loadScene(hotspot.next);
+}
+
+// Password Number Pad Functions
+function openPasswordPrompt(hotspot) {
+    const passwordOverlay = document.getElementById('passwordOverlay');
+    const passwordDisplay = document.getElementById('passwordDisplay');
+    
+    gameState.passwordInput = '';
+    passwordDisplay.textContent = '----';
+    passwordDisplay.classList.remove('shake', 'success');
+    passwordOverlay.classList.add('active');
+    
+    window.currentPasswordHotspot = hotspot;
+}
+
+function addDigit(digit) {
+    if (gameState.passwordInput.length < 4) {
+        gameState.passwordInput += digit;
+        updatePasswordDisplay();
+        playSound('switch');
+        
+        // Auto-check when 4 digits entered
+        if (gameState.passwordInput.length === 4) {
+            setTimeout(() => {
+                checkPassword();
+            }, 200);
+        }
+    }
+}
+
+function clearPassword() {
+    gameState.passwordInput = '';
+    updatePasswordDisplay();
+    playSound('switch');
+}
+
+function updatePasswordDisplay() {
+    const display = document.getElementById('passwordDisplay');
+    const password = gameState.passwordInput;
+    const remaining = 4 - password.length;
+    display.textContent = password + '-'.repeat(remaining);
+}
+
+function checkPassword() {
+    const hotspot = window.currentPasswordHotspot;
+    const display = document.getElementById('passwordDisplay');
+    
+    if (gameState.passwordInput === hotspot.password) {
+        // Correct password
+        display.classList.add('success');
+        playSound('correct');
+        
+        setTimeout(() => {
+            closePasswordPrompt();
+            
+            if (hotspot.item && !gameState.inventory.includes(hotspot.item)) {
+                gameState.inventory.push(hotspot.item);
+            }
+            
+            loadScene(gameState.currentScene);
+        }, 800);
+    } else {
+        // Wrong password
+        display.classList.add('shake');
+        playSound('incorrect');
+        
+        setTimeout(() => {
+            display.classList.remove('shake');
+            clearPassword();
+        }, 500);
+    }
+}
+
+function closePasswordPrompt() {
+    const passwordOverlay = document.getElementById('passwordOverlay');
+    passwordOverlay.classList.remove('active');
+    gameState.passwordInput = '';
 }
 
 // Play sound effect
@@ -632,20 +704,16 @@ function playSound(soundType) {
     const sound = soundEffects[soundType];
     
     if (sound) {
-        sound.currentTime = 0; // Reset to start
+        sound.currentTime = 0;
         sound.play().catch(e => console.log('Audio play failed:', e));
-    } else {
-        console.log('Sound not found:', soundType);
     }
 }
 
 // Initialize audio
 function initAudio() {
-    // Initialize background music
     bgMusic = document.getElementById('bgMusic');
     if (bgMusic) bgMusic.volume = 0.3;
     
-    // Initialize all sound effects from config
     Object.keys(soundConfig).forEach(soundName => {
         const audioElement = document.getElementById(soundName + 'Sound');
         if (audioElement) {
@@ -662,7 +730,6 @@ function startBackgroundMusic() {
     if (bgMusic) {
         bgMusic.play().catch(e => {
             console.log('Background music autoplay prevented:', e);
-            // User interaction required for autoplay
         });
     }
 }
@@ -716,7 +783,6 @@ function startGame() {
     const titleScreen = document.getElementById('titleScreen');
     const blackScreen = document.getElementById('blackScreen');
     
-    // Initialize audio
     initAudio();
     
     titleScreen.classList.add('hidden');
@@ -728,7 +794,6 @@ function startGame() {
     setTimeout(() => {
         loadScene('plane');
         blackScreen.classList.remove('active');
-        // Start background music after user interaction
         startBackgroundMusic();
     }, 1000);
 }
@@ -750,7 +815,6 @@ document.addEventListener('mousemove', function(e) {
     const container = document.getElementById('gameContainer');
     const rect = container.getBoundingClientRect();
     
-    // Calculate percentage position relative to container
     const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
     const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
     

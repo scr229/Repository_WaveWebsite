@@ -6,25 +6,12 @@
     <title>Wave Energy Power Station</title>
     <link rel="stylesheet" href="https://use.typekit.net/ixv1ere.css">    
     <link rel="stylesheet" href="style.css">
-    <style>
-        .handwrite {
-            font-family: "old-man-eloquent", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-            font-size: 40px;
-        }
-        .bodytext {
-            font-family: "edu-nsw-act-hand-precursive", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
-    </style>
 </head>
 <body>
-    <!-- Debug Toggle (remove in production) -->
+    <!-- Debug Toggle -->
     <button class="debug-toggle" onclick="toggleDebugMode()">Toggle Debug</button>
 
-    <!-- Mouse Position Display (for hotspot placement) -->
+    <!-- Mouse Position Display -->
     <div class="mouse-position" id="mousePosition">
         <div>X: <span id="mouseX">0</span>%</div>
         <div>Y: <span id="mouseY">0</span>%</div>
@@ -64,24 +51,27 @@
         <img id="overlayImage" class="overlay-image" src="" alt="Close-up">
     </div>
 
-    <!-- Password Input Overlay -->
+    <!-- Password Number Pad Overlay -->
     <div class="overlay password-overlay" id="passwordOverlay">
-        <div class="password-container">
-            <div class="password-title">Enter Password</div>
-            <input 
-                type="text" 
-                id="passwordInput" 
-                class="password-input" 
-                placeholder="****"
-                maxlength="10"
-                autocomplete="off"
-            >
-            <div id="passwordError" class="password-error"></div>
-            <div class="password-buttons">
-                <button onclick="checkPassword()" class="password-btn password-btn-submit">Submit</button>
-                <button onclick="closePasswordPrompt()" class="password-btn password-btn-cancel">Cancel</button>
-            </div>
-        </div>
+        <img src="Photos/Numberpad.png" class="numberpad-image" alt="Number Pad">
+        <div class="password-display-overlay" id="passwordDisplay">----</div>
+        
+        <!-- Invisible hotspots over number pad image -->
+        <div class="numpad-hotspot" style="left: 20%; top: 30%; width: 20%; height: 15%;" onclick="addDigit('1')"></div>
+        <div class="numpad-hotspot" style="left: 40%; top: 30%; width: 20%; height: 15%;" onclick="addDigit('2')"></div>
+        <div class="numpad-hotspot" style="left: 60%; top: 30%; width: 20%; height: 15%;" onclick="addDigit('3')"></div>
+        
+        <div class="numpad-hotspot" style="left: 20%; top: 45%; width: 20%; height: 15%;" onclick="addDigit('4')"></div>
+        <div class="numpad-hotspot" style="left: 40%; top: 45%; width: 20%; height: 15%;" onclick="addDigit('5')"></div>
+        <div class="numpad-hotspot" style="left: 60%; top: 45%; width: 20%; height: 15%;" onclick="addDigit('6')"></div>
+        
+        <div class="numpad-hotspot" style="left: 20%; top: 60%; width: 20%; height: 15%;" onclick="addDigit('7')"></div>
+        <div class="numpad-hotspot" style="left: 40%; top: 60%; width: 20%; height: 15%;" onclick="addDigit('8')"></div>
+        <div class="numpad-hotspot" style="left: 60%; top: 60%; width: 20%; height: 15%;" onclick="addDigit('9')"></div>
+        
+        <div class="numpad-hotspot" style="left: 20%; top: 75%; width: 20%; height: 15%;" onclick="clearPassword()"></div>
+        <div class="numpad-hotspot" style="left: 40%; top: 75%; width: 20%; height: 15%;" onclick="addDigit('0')"></div>
+        <div class="numpad-hotspot" style="left: 60%; top: 75%; width: 20%; height: 15%;" onclick="closePasswordPrompt()"></div>
     </div>
 
     <!-- Audio Elements -->
@@ -113,10 +103,16 @@
         <source src="Audio/splash.mp3" type="audio/mpeg">
     </audio>
 
+    <audio id="correctSound">
+        <source src="Audio/correct.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="incorrectSound">
+        <source src="Audio/incorrect.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Audio Control Button -->
-    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()">
-        🔊
-    </button>
+    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()">🔊</button>
     
     <script src="script.js"></script>
 </body>
