@@ -143,7 +143,7 @@ const scenes = {
         },
         conditionalImages: [
             {
-                check: () => gameState.inventory.includes('seen'),
+                check: () => gameState.inventory.includes('seen') && !gameState.inventory.includes('buoy'),
                 images: {
                     default: 'Photos/Render_Front_buoy.png',
                     stage2: 'Photos/Render_Front_buoy_rain.png',
@@ -510,6 +510,16 @@ const scenes = {
                 next: 'ocean',
                 item: null,
                 sound: 'splash'
+            },
+            {
+                x: 43,
+                y: 68,
+                width: 6,
+                height: 4,
+                type: 'inspect',
+                inspectImage: 'Photos/paper_site.png',
+                item: 'seen',
+                sound: 'paper'
             },
             {
                 x: 30,
