@@ -23,16 +23,18 @@
     <!-- Title Screen -->
     <div class="title-screen" id="titleScreen">
         <div class="game-title">The Lost Generator</div>
-        <button class="start-button" onclick="startGame()">Search</button>
+        <button class="start-button" onclick="startGame()">Explore</button>
     </div>
     
     <!-- Black Screen Transition -->
-    <div class="black-screen" id="blackScreen"></div>
+    <div class="black-screen" id="blackScreen">
+        <img src="Photos/Black_Screen2.png" alt="">
+    </div>
 
     <!-- Game Container -->
     <div class="game-container" id="gameContainer">
         <div class="image-container">
-            <img id="gameImage" class="game-image" src="" alt="Game Scene">
+            <img id="gameImage" class="game-image" src="Photos/Black_Screen.png" alt="Game Scene">
             <div id="hotspotsContainer" class="hotspots-container"></div>
         </div>
     </div>
@@ -57,22 +59,23 @@
         <div class="password-display-overlay" id="passwordDisplay">----</div>
         
         <!-- Invisible hotspots over number pad image -->
-        <div class="numpad-hotspot" style="left: 20%; top: 30%; width: 20%; height: 15%;" onclick="addDigit('1')"></div>
-        <div class="numpad-hotspot" style="left: 40%; top: 30%; width: 20%; height: 15%;" onclick="addDigit('2')"></div>
-        <div class="numpad-hotspot" style="left: 60%; top: 30%; width: 20%; height: 15%;" onclick="addDigit('3')"></div>
+        <div class="numpad-hotspot" style="left: 43%; top: 28%; width: 3%; height: 5%;" onclick="addDigit('1')"></div>
+        <div class="numpad-hotspot" style="left: 48%; top: 28%; width: 3%; height: 5%;" onclick="addDigit('2')"></div>
+        <div class="numpad-hotspot" style="left: 53%; top: 28%; width: 3%; height: 5%;" onclick="addDigit('3')"></div>
         
-        <div class="numpad-hotspot" style="left: 20%; top: 45%; width: 20%; height: 15%;" onclick="addDigit('4')"></div>
-        <div class="numpad-hotspot" style="left: 40%; top: 45%; width: 20%; height: 15%;" onclick="addDigit('5')"></div>
-        <div class="numpad-hotspot" style="left: 60%; top: 45%; width: 20%; height: 15%;" onclick="addDigit('6')"></div>
+        <div class="numpad-hotspot" style="left: 43%; top: 36%; width: 3%; height: 5%;" onclick="addDigit('4')"></div>
+        <div class="numpad-hotspot" style="left: 48%; top: 36%; width: 3%; height: 5%;" onclick="addDigit('5')"></div>
+        <div class="numpad-hotspot" style="left: 53%; top: 36%; width: 3%; height: 5%;" onclick="addDigit('6')"></div>
         
-        <div class="numpad-hotspot" style="left: 20%; top: 60%; width: 20%; height: 15%;" onclick="addDigit('7')"></div>
-        <div class="numpad-hotspot" style="left: 40%; top: 60%; width: 20%; height: 15%;" onclick="addDigit('8')"></div>
-        <div class="numpad-hotspot" style="left: 60%; top: 60%; width: 20%; height: 15%;" onclick="addDigit('9')"></div>
+        <div class="numpad-hotspot" style="left: 43%; top: 45%; width: 3%; height: 5%;" onclick="addDigit('7')"></div>
+        <div class="numpad-hotspot" style="left: 48%; top: 45%; width: 3%; height: 5%;" onclick="addDigit('8')"></div>
+        <div class="numpad-hotspot" style="left: 53%; top: 45%; width: 3%; height: 5%;" onclick="addDigit('9')"></div>
         
-        <div class="numpad-hotspot" style="left: 20%; top: 75%; width: 20%; height: 15%;" onclick="clearPassword()"></div>
-        <div class="numpad-hotspot" style="left: 40%; top: 75%; width: 20%; height: 15%;" onclick="addDigit('0')"></div>
-        <div class="numpad-hotspot" style="left: 60%; top: 75%; width: 20%; height: 15%;" onclick="closePasswordPrompt()"></div>
+        <div class="numpad-hotspot" style="left: 43%; top: 53%; width: 3%; height: 5%;" onclick="clearPassword()"></div>
+        <div class="numpad-hotspot" style="left: 48%; top: 53%; width: 3%; height: 5%;" onclick="addDigit('0')"></div>
+        <div class="numpad-hotspot" style="left: 53%; top: 53%; width: 3%; height: 5%;" onclick="closePasswordPrompt()"></div>
     </div>
+
 
     <!-- Audio Elements -->
     <audio id="bgMusic" loop>
@@ -88,7 +91,11 @@
     </audio>
 
     <audio id="switchSound">
-        <source src="Audio/click.wav" type="audio/mpeg">
+        <source src="Audio/click.wav" type="audio/wav">
+    </audio>
+
+    <audio id="flipSound">
+        <source src="Audio/click.mp3" type="audio/mpeg">
     </audio>
 
     <audio id="metalstepSound">
@@ -104,11 +111,27 @@
     </audio>
 
     <audio id="correctSound">
-        <source src="Audio/correct.mp3" type="audio/mpeg">
+        <source src="Audio/hum.mp3" type="audio/mpeg">
     </audio>
 
     <audio id="incorrectSound">
         <source src="Audio/incorrect.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="rainSound">
+        <source src="Audio/incorrect.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="stormSound">
+        <source src="Audio/incorrect.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="boopSound">
+        <source src="Audio/beep.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="thunderSound">
+        <source src="Audio/thunder.mp3" type="audio/mpeg">
     </audio>
 
     <!-- Audio Control Button -->

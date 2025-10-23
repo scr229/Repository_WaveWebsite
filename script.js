@@ -1,7 +1,7 @@
 // Game state
 let gameState = {
     currentScene: 'plane',
-    inventory: ['buoyPlaced'],
+    inventory: [''],
     decisionCount: 0,
     audioEnabled: true,
     passwordInput: ''
@@ -18,11 +18,14 @@ const soundConfig = {
     door: { volume: 0.7 },
     splash: { volume: 0.4 },
     switch: { volume: 0.8 },
+    flip: { volume: 0.8 },
     metalstep: { volume: 0.8 },
     paper: { volume: 0.3 },
     metalsqueak: { volume: 0.5 },
-    correct: { volume: 0.7 },
-    incorrect: { volume: 0.7 }
+    correct: { volume: 0.5 },
+    incorrect: { volume: 0.7 },
+    boop: { volume: 0.6 },
+    thunder: { volume: 0.2 }
 };
 
 // Scene definitions - Copy all your scenes from your file
@@ -34,15 +37,24 @@ const scenes = {
             stage2: 'Photos/Render_plane.png',
             stage3: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800'
         },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('phone'),
+                images: {
+                    default: 'Photos/Render_plane_gone.png',
+                    stage2: 'Photos/Render_plane_gone.png',
+                    stage3: 'Photos/Render_plane_gone.png'
+                }
+            }
+        ],
         hotspots: [
             {
                 x: 50,
                 y: 79,
                 width: 2.7,
                 height: 5.5,
-                type: 'inspect',
-                inspectImage: 'Photos/Render_Phone_Dead_single.png',
-                item: null,
+                next: 'phoneforest',
+                item: 'phone',
                 sound: 'switch'
             },
             {
@@ -56,6 +68,25 @@ const scenes = {
             }
         ]
     },
+    phoneforest: {
+        title: 'phone forest',
+        images: {
+            default: 'Photos/Render_Phone_forest.png',
+            stage2: 'Photos/Render_Phone_forest.png',
+            stage3: 'Photos/Render_Phone_forest.png'
+        },
+        hotspots: [
+            {
+                x: 30,
+                y: 10,
+                width: 30,
+                height: 80,
+                next: 'plane',
+                item: null,
+                sound: 'switch'
+            }
+        ]
+    },
     intro: {
         title: 'Approach',
         images: {
@@ -66,7 +97,7 @@ const scenes = {
         hotspots: [
             {
                 x: 57,
-                y: 69,
+                y: 67.5,
                 width: 3,
                 height: 4,
                 type: 'inspect',
@@ -94,9 +125,9 @@ const scenes = {
             },
             {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'plane',
                 item: null,
                 sound: 'step'
@@ -110,6 +141,16 @@ const scenes = {
             stage2: 'Photos/Render_Front_Rain.png',
             stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
         },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('seen'),
+                images: {
+                    default: 'Photos/Render_Front_buoy.png',
+                    stage2: 'Photos/Render_Front_buoy_rain.png',
+                    stage3: 'Photos/Render_Phone_beach_charge.png'
+                }
+            }
+        ],
         hotspots: [
             {
                 x: 41,
@@ -121,10 +162,10 @@ const scenes = {
                 sound: 'step'
             },
             {
-                x: 56,
-                y: 74,
-                width: 11,
-                height: 15,
+                x: 53,
+                y: 70,
+                width: 16,
+                height: 19,
                 next: 'grass',
                 item: null,
                 condition: () => gameState.inventory.includes('seen'),
@@ -132,9 +173,9 @@ const scenes = {
             },
             {
                 x: 30,
-                y: 91,
+                y: 88,
                 width: 38,
-                height: 9,
+                height: 12,
                 next: 'intro',
                 item: null,
                 sound: 'step'
@@ -144,10 +185,20 @@ const scenes = {
     ground: {
         title: 'Ground Level',
         images: {
-            default: 'Photos/Render_Ground.png',
-            stage2: 'Photos/Render_Ground_rain.png',
+            default: 'Photos/Render_Ground_off.png',
+            stage2: 'Photos/Render_Ground_off_rain.png',
             stage3: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
         },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('PowerOn'),
+                images: {
+                    default: 'Photos/Render_Ground_on.png',
+                    stage2: 'Photos/Render_Ground_on_rain.png',
+                    stage3: 'Photos/Render_Phone_beach_charge.png'
+                }
+            }
+        ],
         hotspots: [
             {
                 x: 41.5,
@@ -169,13 +220,101 @@ const scenes = {
                 sound: 'paper'
             },
             {
+                x: 38,
+                y: 55,
+                width: 1.5,
+                height: 5,
+                next: 'phoneBeach',
+                item: null,
+                sound: 'switch',
+                condition: () => gameState.inventory.includes('phone') && gameState.inventory.includes('PowerOn') && !gameState.inventory.includes('phonecall'),
+            },
+            {
+                x: 38,
+                y: 55,
+                width: 1.5,
+                height: 5,
+                item: null,
+                sound: 'switch',
+                condition: () => !gameState.inventory.includes('phone'),
+            },
+                        {
+                x: 38,
+                y: 55,
+                width: 1.5,
+                height: 5,
+                next: 'phonecall',
+                item: null,
+                sound: 'switch',
+                condition: () => gameState.inventory.includes('phone') && gameState.inventory.includes('PowerOn') && gameState.inventory.includes('phonecall'),
+            },
+            {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'front',
                 item: null,
                 sound: 'step'
+            }
+        ]
+    },
+    phoneBeach: {
+        title: 'phoneBeach',
+        images: {
+            default: 'Photos/Render_Phone_beach_dead.png',
+            stage2: 'Photos/Render_Phone_beach_dead.png',
+            stage3: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=800'
+        },
+        conditionalImages: [
+            {
+                check: () => gameState.inventory.includes('PowerOn'),
+                images: {
+                    default: 'Photos/Render_Phone_beach_charge.png',
+                    stage2: 'Photos/Render_Phone_beach_charge.png',
+                    stage3: 'Photos/Render_Phone_beach_charge.png'
+                }
+            }
+        ],
+        hotspots: [
+            {
+                x: 35,
+                y: 10,
+                width: 25,
+                height: 80,
+                next: 'phonecall',
+                item: 'phonecall',
+                sound: 'boop',
+                condition: () => gameState.inventory.includes('PowerOn') && !gameState.inventory.includes('phonecall'),
+            },
+            {
+                x: 35,
+                y: 10,
+                width: 25,
+                height: 80,
+                next: 'ground',
+                item: null,
+                sound: 'switch',
+                condition: () => !gameState.inventory.includes('PowerOn') && !gameState.inventory.includes('phonecall'),
+            }
+        ]
+    },
+    phonecall: {
+        title: 'phonecall',
+        images: {
+            default: 'Photos/Render_Phone_beach_call.png',
+            stage2: 'Photos/Render_Phone_beach_call.png',
+            stage3: 'https://images.unsplash.com/photo-1531310197839-ccf54634509e?w=800'
+        },
+        hotspots: [
+            {
+                x: 35,
+                y: 10,
+                width: 25,
+                height: 80,
+                next: 'ground',
+                item: null,
+                sound: 'switch'
             }
         ]
     },
@@ -217,9 +356,9 @@ const scenes = {
             },
             {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'ground',
                 item: null,
                 sound: 'metalstep'
@@ -250,17 +389,27 @@ const scenes = {
                 width: 18,
                 height: 6,
                 type: 'password',
-                password: '1234',
+                password: '5684',
                 item: 'PowerOn',
                 condition: () => gameState.inventory.includes('buoyPlaced') && !gameState.inventory.includes('PowerOn'),
-                sound: 'switch'
+            },
+
+            {
+                x: 48,
+                y: 50,
+                width: 18,
+                height: 6,
+                type: 'inspect',
+                inspectImage: 'Photos/Numberpad.png',
+                condition: () => !gameState.inventory.includes('buoyPlaced'),
+                sound: 'switch2'
             },
 
             {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'secondfloor',
                 item: null,
                 sound: 'metalstep'
@@ -336,9 +485,9 @@ const scenes = {
             },
             {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'thirdfloor',
                 item: null,
                 sound: 'metalstep'
@@ -364,9 +513,9 @@ const scenes = {
             },
             {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'intro',
                 item: null,
                 sound: 'step'
@@ -403,9 +552,9 @@ const scenes = {
             },
             {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'front',
                 item: null,
                 sound: 'step'
@@ -442,9 +591,9 @@ const scenes = {
             },
             {
                 x: 30,
-                y: 91,
+                y: 75,
                 width: 38,
-                height: 9,
+                height: 25,
                 next: 'beach',
                 item: null,
                 sound: 'splash'
@@ -456,66 +605,104 @@ const scenes = {
         images: {
             default: 'Photos/Render_Waves.png',
             stage2: 'Photos/Render_Waves.png',
-            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+            stage3: 'Photos/Render_Waves.png'
         },
-        hotspots: [
-            {
-                x: 31,
-                y: 0,
-                width: 68,
-                height: 100,
-                next: 'win2',
-            }
-        ]
+        autoAdvance: {
+            next: 'win2',
+            wait: 3000,      // How long to show this scene
+            delay: 2000      // Fade transition duration
+        },
+        hotspots: []
     },
     win2: {
         title: 'flood',
         images: {
             default: 'Photos/Render_Storm_Won.png',
-            stage2: 'Photos/Render_Waves.png',
-            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+            stage2: 'Photos/Render_Storm_Won.png',
+            stage3: 'Photos/Render_Storm_Won.png'
         },
-        hotspots: [
-            {
-                x: 31,
-                y: 0,
-                width: 68,
-                height: 100,
-                next: 'winscreen',
-            }
-        ]
+        autoAdvance: {
+            next: 'winscreen',
+            wait: 3000,
+            delay: 2000
+        },
+        hotspots: []
     },
     lose1: {
         title: 'waves',
         images: {
             default: 'Photos/Render_Waves.png',
             stage2: 'Photos/Render_Waves.png',
-            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+            stage3: 'Photos/Render_Waves.png'
         },
-        hotspots: [
-            {
-                x: 31,
-                y: 0,
-                width: 68,
-                height: 100,
-                next: 'lose2',
-            }
-        ]
+        autoAdvance: {
+            next: 'lose2',
+            wait: 4000,
+            delay: 2000
+        },
+        hotspots: []
     },
     lose2: {
         title: 'storm',
         images: {
             default: 'Photos/Render_Storm_Lost.png',
             stage2: 'Photos/Render_Storm_Lost.png',
-            stage3: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800'
+            stage3: 'Photos/Render_Storm_Lost.png'
+        },
+        autoAdvance: {
+            next: 'losescreen',
+            wait: 4000,
+            delay: 2000
+        },
+        hotspots: []
+    },
+    winscreen: {
+    title: 'Victory',
+    images: {
+        default: 'Photos/Black_Screen.png',  // Just a black image
+        stage2: 'Photos/Black_Screen.png',
+        stage3: 'Photos/Black_Screen.png'
+    },
+    endingText: {
+        title: 'Survival',
+        message: 'You successfully contact help and flee the oncoming storm.',
+        buttonText: 'Start Again'
+    },
+    hotspots: [
+        {
+            x: 35,
+            y: 64,
+            width: 30,
+            height: 12,
+            next: 'plane',
+            item: null,
+            sound: 'switch',
+            restart: true
+        }
+    ]
+    },
+    losescreen: {
+        title: 'Defeat',
+        images: {
+            default: 'Photos/Black_Screen.png',
+            stage2: 'Photos/Black_Screen.png',
+            stage3: 'Photos/Black_Screen.png'
+        },
+        endingText: {
+            title: 'Perished',
+            message: 'Unable to contact help, you succumb to the storm.',
+            buttonText: 'Try Again'
         },
         hotspots: [
             {
-                x: 31,
-                y: 0,
-                width: 68,
-                height: 100,
-                next: 'losescreen',
+                x: 35,
+                y: 64,
+                width: 30,
+                height: 12,
+                next: 'plane',
+                item: null,
+                sound: 'switch',
+                restart: true
             }
         ]
     }
@@ -544,6 +731,50 @@ function getSceneImage(scene) {
     return scene.images[imageStage];
 }
 
+// Add this new function after the getSceneImage function
+function updateBackgroundMusic() {
+    if (!gameState.audioEnabled || !bgMusic) return;
+    
+    let newSrc;
+    
+    if (gameState.decisionCount >= 100) {
+        newSrc = 'Audio/rain_heavy.mp3';
+    } else if (gameState.decisionCount >= 20) {
+        newSrc = 'Audio/rain_approaching.mp3';
+    } else {
+        newSrc = 'Audio/Background_waves.mp3';
+    }
+    
+    // Only change if the track is actually different
+    const currentSrc = bgMusic.src;
+    if (!currentSrc.endsWith(newSrc)) {
+        const currentTime = bgMusic.currentTime; // Save current position
+        const wasPlaying = !bgMusic.paused;
+        
+        bgMusic.src = newSrc;
+        bgMusic.currentTime = 0; // Start new track from beginning
+        
+        if (wasPlaying) {
+            bgMusic.play();
+        }
+    }
+    // If same track, do nothing - let it continue playing
+}
+
+function checkMusicStageChange() {
+    if (!gameState.audioEnabled) return;
+    
+    // Check if we just hit stage 2 (decision count is exactly 20)
+    if (gameState.decisionCount === 20) {
+        playSound('thunder'); // Or whatever sound you want
+    }
+    
+    // Optional: Check for stage 3
+    if (gameState.decisionCount === 40) {
+        playSound('thunder');
+    }
+}
+
 // Load a scene
 function loadScene(sceneKey) {
     gameState.currentScene = sceneKey;
@@ -557,13 +788,26 @@ function loadScene(sceneKey) {
         img.classList.remove('fade-out');
         renderHotspots(scene);
         updateInventory();
+        updateBackgroundMusic();
     }, 300);
 }
 
-// Render hotspots for current scene
+// Update the renderHotspots function to show ending text:
 function renderHotspots(scene) {
     const container = document.getElementById('hotspotsContainer');
     container.innerHTML = '';
+    
+    // Check if this scene has ending text
+    if (scene.endingText) {
+        const textOverlay = document.createElement('div');
+        textOverlay.className = 'ending-text-overlay';
+        textOverlay.innerHTML = `
+            <div class="ending-title">${scene.endingText.title}</div>
+            <div class="ending-message">${scene.endingText.message}</div>
+            <div class="ending-button">${scene.endingText.buttonText}</div>
+        `;
+        container.appendChild(textOverlay);
+    }
     
     if (!scene.hotspots) return;
     
@@ -598,18 +842,28 @@ function renderHotspots(scene) {
     });
 }
 
-// Handle hotspot click
+
+
+// Update makeChoice to handle restart and use long fade for endings:
 function makeChoice(hotspot) {
     playSound(hotspot.sound);
     gameState.decisionCount++;
+    checkMusicStageChange();
     
-    if (gameState.decisionCount === 40 && !gameState.inventory.includes('PowerOn')) {
-        loadScene('lose1');
+    // Check for restart flag
+    if (hotspot.restart) {
+        // Reset game state
+        gameState.inventory = [];
+        gameState.decisionCount = 0;
+    }
+    
+    if (gameState.decisionCount === 40 && !gameState.inventory.includes('phonecall')) {
+        loadSceneWithLongFade('lose1', 2000);  // Use long fade for endings
         return;
     }
 
-        if (gameState.decisionCount === 40 && gameState.inventory.includes('PowerOn')) {
-        loadScene('win1');
+    if (gameState.decisionCount === 40 && gameState.inventory.includes('phonecall')) {
+        loadSceneWithLongFade('win1', 2000);   // Use long fade for endings
         return;
     }
     
@@ -669,6 +923,7 @@ function checkPassword() {
         // Correct password
         display.classList.add('success');
         playSound('correct');
+        playSound('boop');
         
         setTimeout(() => {
             closePasswordPrompt();
@@ -695,6 +950,7 @@ function closePasswordPrompt() {
     const passwordOverlay = document.getElementById('passwordOverlay');
     passwordOverlay.classList.remove('active');
     gameState.passwordInput = '';
+    playSound('switch');
 }
 
 // Play sound effect
@@ -778,7 +1034,7 @@ function updateInventory() {
     decisionCount.textContent = gameState.decisionCount;
 }
 
-// Start the game
+// Update the startGame function:
 function startGame() {
     const titleScreen = document.getElementById('titleScreen');
     const blackScreen = document.getElementById('blackScreen');
@@ -786,6 +1042,9 @@ function startGame() {
     initAudio();
     
     titleScreen.classList.add('hidden');
+    
+    // Start preloading images
+    preloadImages();
     
     setTimeout(() => {
         blackScreen.classList.add('active');
@@ -795,7 +1054,31 @@ function startGame() {
         loadScene('plane');
         blackScreen.classList.remove('active');
         startBackgroundMusic();
-    }, 1000);
+    }, 2000);
+}
+
+// Add this new function for longer fade transitions
+function loadSceneWithLongFade(sceneKey, fadeDelay = 2000) {
+    gameState.currentScene = sceneKey;
+    const scene = scenes[sceneKey];
+    
+    const img = document.getElementById('gameImage');
+    img.classList.add('fade-out');
+    
+    setTimeout(() => {
+        img.src = getSceneImage(scene);
+        img.classList.remove('fade-out');
+        renderHotspots(scene);
+        updateInventory();
+        updateBackgroundMusic();
+        
+        // Auto-advance to next scene if specified
+        if (scene.autoAdvance) {
+            setTimeout(() => {
+                loadSceneWithLongFade(scene.autoAdvance.next, scene.autoAdvance.delay || 2000);
+            }, scene.autoAdvance.wait || 3000);
+        }
+    }, fadeDelay);
 }
 
 // Debug mode toggle
@@ -837,3 +1120,50 @@ document.getElementById('mousePosition').addEventListener('click', function(e) {
         }, 1000);
     });
 });
+
+// Add this function to preload images
+function preloadImages() {
+    const imagesToPreload = [];
+    
+    // Collect all image URLs from scenes
+    Object.values(scenes).forEach(scene => {
+        // Add default images
+        if (scene.images) {
+            imagesToPreload.push(scene.images.default);
+            if (scene.images.stage2) imagesToPreload.push(scene.images.stage2);
+            if (scene.images.stage3) imagesToPreload.push(scene.images.stage3);
+        }
+        
+        // Add conditional images
+        if (scene.conditionalImages) {
+            scene.conditionalImages.forEach(condImg => {
+                if (condImg.images) {
+                    imagesToPreload.push(condImg.images.default);
+                    if (condImg.images.stage2) imagesToPreload.push(condImg.images.stage2);
+                    if (condImg.images.stage3) imagesToPreload.push(condImg.images.stage3);
+                }
+            });
+        }
+        
+        // Add inspect images
+        if (scene.hotspots) {
+            scene.hotspots.forEach(hotspot => {
+                if (hotspot.inspectImage) {
+                    imagesToPreload.push(hotspot.inspectImage);
+                }
+            });
+        }
+    });
+    
+    // Remove duplicates
+    const uniqueImages = [...new Set(imagesToPreload)];
+    
+    // Preload each image
+    uniqueImages.forEach(src => {
+        if (src && !src.startsWith('http')) { // Only preload local images
+            const img = new Image();
+            img.src = src;
+        }
+    });
+}
+
