@@ -11,6 +11,10 @@ let gameState = {
 let bgMusic;
 let soundEffects = {};
 
+// Image dimensions - all hotspots are positioned relative to this
+const IMAGE_WIDTH = 468;
+const IMAGE_HEIGHT = 703;
+
 // Sound effect configuration
 const soundConfig = {
     step: { volume: 0.5 },
@@ -28,7 +32,7 @@ const soundConfig = {
     thunder: { volume: 0.2 }
 };
 
-// Scene definitions - Copy all your scenes from your file
+// Scene definitions - hotspots in PIXELS relative to 468×703 image
 const scenes = {
     plane: {
         title: 'Crash Site',
@@ -49,19 +53,19 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 50,
-                y: 79,
-                width: 2.7,
-                height: 5.5,
+                x: 234.00,
+                y: 555.37,
+                width: 34.56,
+                height: 38.66,
                 next: 'phoneforest',
                 item: 'phone',
                 sound: 'switch'
             },
             {
-                x: 50,
-                y: 37,
-                width: 10,
-                height: 11,
+                x: 234.00,
+                y: 260.11,
+                width: 128.00,
+                height: 77.33,
                 next: 'intro',
                 item: null,
                 sound: 'step'
@@ -77,10 +81,10 @@ const scenes = {
         },
         hotspots: [
             {
-                x: 30,
-                y: 10,
-                width: 30,
-                height: 80,
+                x: -22.00,
+                y: 70.30,
+                width: 384.00,
+                height: 562.40,
                 next: 'plane',
                 item: null,
                 sound: 'switch'
@@ -96,38 +100,38 @@ const scenes = {
         },
         hotspots: [
             {
-                x: 57,
-                y: 67.5,
-                width: 3,
-                height: 4,
+                x: 323.60,
+                y: 474.53,
+                width: 38.40,
+                height: 28.12,
                 type: 'inspect',
                 inspectImage: 'Photos/Battery_diagram.png',
                 item: null,
                 sound: 'paper'
             },
             {
-                x: 31,
-                y: 39,
-                width: 14,
-                height: 19,
+                x: -9.20,
+                y: 274.17,
+                width: 179.20,
+                height: 133.57,
                 next: 'front',
                 item: null,
                 sound: 'step'
             },
             {
-                x: 46,
-                y: 50,
-                width: 9,
-                height: 8,
+                x: 182.80,
+                y: 351.50,
+                width: 115.20,
+                height: 56.24,
                 next: 'beach',
                 item: null,
                 sound: 'step'
             },
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'plane',
                 item: null,
                 sound: 'step'
@@ -153,29 +157,29 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 41,
-                y: 55,
-                width: 15,
-                height: 20,
+                x: 118.80,
+                y: 386.65,
+                width: 192.00,
+                height: 140.60,
                 next: 'ground',
                 item: null,
                 sound: 'step'
             },
             {
-                x: 53,
-                y: 70,
-                width: 16,
-                height: 19,
+                x: 272.40,
+                y: 492.10,
+                width: 204.80,
+                height: 133.57,
                 next: 'grass',
                 item: null,
                 condition: () => gameState.inventory.includes('seen'),
                 sound: 'step'
             },
             {
-                x: 30,
-                y: 88,
-                width: 38,
-                height: 12,
+                x: -22.00,
+                y: 618.64,
+                width: 486.40,
+                height: 84.36,
                 next: 'intro',
                 item: null,
                 sound: 'step'
@@ -201,58 +205,58 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 41.5,
-                y: 54,
-                width: 10,
-                height: 18.5,
+                x: 125.20,
+                y: 379.62,
+                width: 128.00,
+                height: 130.06,
                 next: 'secondfloor',
                 item: null,
                 sound: 'metalstep'
             },
             {
-                x: 35,
-                y: 46,
-                width: 5,
-                height: 4,
+                x: 42.00,
+                y: 323.38,
+                width: 64.00,
+                height: 28.12,
                 type: 'inspect',
                 inspectImage: 'Photos/Section_Crumpled.png',
                 item: null,
                 sound: 'paper'
             },
             {
-                x: 38,
-                y: 55,
-                width: 1.5,
-                height: 5,
+                x: 80.40,
+                y: 386.65,
+                width: 19.20,
+                height: 35.15,
                 next: 'phoneBeach',
                 item: null,
                 sound: 'switch',
                 condition: () => gameState.inventory.includes('phone') && gameState.inventory.includes('PowerOn') && !gameState.inventory.includes('phonecall'),
             },
             {
-                x: 38,
-                y: 55,
-                width: 1.5,
-                height: 5,
+                x: 80.40,
+                y: 386.65,
+                width: 19.20,
+                height: 35.15,
                 item: null,
                 sound: 'switch',
                 condition: () => !gameState.inventory.includes('phone'),
             },
-                        {
-                x: 38,
-                y: 55,
-                width: 1.5,
-                height: 5,
+            {
+                x: 80.40,
+                y: 386.65,
+                width: 19.20,
+                height: 35.15,
                 next: 'phonecall',
                 item: null,
                 sound: 'switch',
                 condition: () => gameState.inventory.includes('phone') && gameState.inventory.includes('PowerOn') && gameState.inventory.includes('phonecall'),
             },
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'front',
                 item: null,
                 sound: 'step'
@@ -278,20 +282,20 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 35,
-                y: 10,
-                width: 25,
-                height: 80,
+                x: 42.00,
+                y: 70.30,
+                width: 320.00,
+                height: 562.40,
                 next: 'phonecall',
                 item: 'phonecall',
                 sound: 'boop',
                 condition: () => gameState.inventory.includes('PowerOn') && !gameState.inventory.includes('phonecall'),
             },
             {
-                x: 35,
-                y: 10,
-                width: 25,
-                height: 80,
+                x: 42.00,
+                y: 70.30,
+                width: 320.00,
+                height: 562.40,
                 next: 'ground',
                 item: null,
                 sound: 'switch',
@@ -308,10 +312,10 @@ const scenes = {
         },
         hotspots: [
             {
-                x: 35,
-                y: 10,
-                width: 25,
-                height: 80,
+                x: 42.00,
+                y: 70.30,
+                width: 320.00,
+                height: 562.40,
                 next: 'ground',
                 item: null,
                 sound: 'switch'
@@ -337,28 +341,28 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 35,
-                y: 46,
-                width: 20,
-                height: 21,
+                x: 42.00,
+                y: 323.38,
+                width: 256.00,
+                height: 147.63,
                 next: 'thirdfloor',
                 item: null,
                 sound: 'metalstep'
             },
             {
-                x: 60,
-                y: 31,
-                width: 6,
-                height: 65,
+                x: 362.00,
+                y: 217.93,
+                width: 76.80,
+                height: 456.95,
                 next: 'servers',
                 item: null,
                 sound: 'metalsqueak'
             },
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'ground',
                 item: null,
                 sound: 'metalstep'
@@ -384,32 +388,30 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 48,
-                y: 50,
-                width: 18,
-                height: 6,
+                x: 208.40,
+                y: 351.50,
+                width: 230.40,
+                height: 42.18,
                 type: 'password',
                 password: '5684',
                 item: 'PowerOn',
                 condition: () => gameState.inventory.includes('buoyPlaced') && !gameState.inventory.includes('PowerOn'),
             },
-
             {
-                x: 48,
-                y: 50,
-                width: 18,
-                height: 6,
+                x: 208.40,
+                y: 351.50,
+                width: 230.40,
+                height: 42.18,
                 type: 'inspect',
                 inspectImage: 'Photos/Numberpad.png',
                 condition: () => !gameState.inventory.includes('buoyPlaced'),
                 sound: 'switch2'
             },
-
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'secondfloor',
                 item: null,
                 sound: 'metalstep'
@@ -425,29 +427,29 @@ const scenes = {
         },
         hotspots: [
             {
-                x: 31,
-                y: 61,
-                width: 14,
-                height: 17,
+                x: -9.20,
+                y: 428.83,
+                width: 179.20,
+                height: 119.51,
                 next: 'lookout',
                 item: null,
                 sound: 'metalstep'
             },
             {
-                x: 44,
-                y: 19,
-                width: 2.5,
-                height: 3,
+                x: 157.20,
+                y: 133.57,
+                width: 32.00,
+                height: 21.09,
                 type: 'inspect',
                 inspectImage: 'Photos/axo_drawing.png',
                 item: null,
                 sound: 'paper'
             },
             {
-                x: 55,
-                y: 66,
-                width: 13,
-                height: 34,
+                x: 298.00,
+                y: 463.98,
+                width: 166.40,
+                height: 239.02,
                 next: 'secondfloor',
                 item: null,
                 sound: 'metalstep'
@@ -473,10 +475,10 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 34,
-                y: 36,
-                width: 15,
-                height: 29,
+                x: 29.20,
+                y: 253.08,
+                width: 192.00,
+                height: 203.87,
                 type: 'inspect',
                 item: 'seen',
                 inspectImage: 'Photos/Render_Buoy_Telescope.png',
@@ -484,10 +486,10 @@ const scenes = {
                 sound: 'metalsqueak'
             },
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'thirdfloor',
                 item: null,
                 sound: 'metalstep'
@@ -503,29 +505,29 @@ const scenes = {
         },
         hotspots: [
             {
-                x: 52,
-                y: 57,
-                width: 6,
-                height: 4,
+                x: 259.60,
+                y: 400.71,
+                width: 76.80,
+                height: 28.12,
                 next: 'ocean',
                 item: null,
                 sound: 'splash'
             },
             {
-                x: 43,
-                y: 68,
-                width: 6,
-                height: 4,
+                x: 144.40,
+                y: 478.04,
+                width: 76.80,
+                height: 28.12,
                 type: 'inspect',
                 inspectImage: 'Photos/paper_site.png',
                 item: 'seen',
                 sound: 'paper'
             },
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'intro',
                 item: null,
                 sound: 'step'
@@ -551,20 +553,20 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 39,
-                y: 26,
-                width: 13,
-                height: 47,
+                x: 93.20,
+                y: 182.78,
+                width: 166.40,
+                height: 330.41,
                 next: 'grass',
                 item: 'buoy',
                 condition: () => !gameState.inventory.includes('buoy'),
                 sound: 'metalstep'
             },
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'front',
                 item: null,
                 sound: 'step'
@@ -590,20 +592,20 @@ const scenes = {
         ],
         hotspots: [
             {
-                x: 40,
-                y: 40,
-                width: 20,
-                height: 30,
+                x: 106.00,
+                y: 281.20,
+                width: 256.00,
+                height: 210.90,
                 next: 'ocean',
                 item: 'buoyPlaced',
                 condition: () => gameState.inventory.includes('buoy') && !gameState.inventory.includes('buoyPlaced'),
                 sound: 'splash'
             },
             {
-                x: 30,
-                y: 75,
-                width: 38,
-                height: 25,
+                x: -22.00,
+                y: 527.25,
+                width: 486.40,
+                height: 175.75,
                 next: 'beach',
                 item: null,
                 sound: 'splash'
@@ -619,8 +621,8 @@ const scenes = {
         },
         autoAdvance: {
             next: 'win2',
-            wait: 3000,      // How long to show this scene
-            delay: 2000      // Fade transition duration
+            wait: 3000,
+            delay: 2000
         },
         hotspots: []
     },
@@ -667,29 +669,29 @@ const scenes = {
         hotspots: []
     },
     winscreen: {
-    title: 'Victory',
-    images: {
-        default: 'Photos/Black_Screen.png',  // Just a black image
-        stage2: 'Photos/Black_Screen.png',
-        stage3: 'Photos/Black_Screen.png'
-    },
-    endingText: {
-        title: 'Survival',
-        message: 'You successfully contact help and flee the oncoming storm.',
-        buttonText: 'Start Again'
-    },
-    hotspots: [
-        {
-            x: 35,
-            y: 64,
-            width: 30,
-            height: 12,
-            next: 'plane',
-            item: null,
-            sound: 'switch',
-            restart: true
-        }
-    ]
+        title: 'Victory',
+        images: {
+            default: 'Photos/Black_Screen.png',
+            stage2: 'Photos/Black_Screen.png',
+            stage3: 'Photos/Black_Screen.png'
+        },
+        endingText: {
+            title: 'Survival',
+            message: 'You successfully contact help and flee the oncoming storm.',
+            buttonText: 'Start Again'
+        },
+        hotspots: [
+            {
+                x: 42.00,
+                y: 449.92,
+                width: 384.00,
+                height: 84.36,
+                next: 'plane',
+                item: null,
+                sound: 'switch',
+                restart: true
+            }
+        ]
     },
     losescreen: {
         title: 'Defeat',
@@ -705,10 +707,10 @@ const scenes = {
         },
         hotspots: [
             {
-                x: 35,
-                y: 64,
-                width: 30,
-                height: 12,
+                x: 42.00,
+                y: 449.92,
+                width: 384.00,
+                height: 84.36,
                 next: 'plane',
                 item: null,
                 sound: 'switch',
@@ -741,7 +743,7 @@ function getSceneImage(scene) {
     return scene.images[imageStage];
 }
 
-// Add this new function after the getSceneImage function
+// Update background music based on decision count
 function updateBackgroundMusic() {
     if (!gameState.audioEnabled || !bgMusic) return;
     
@@ -755,33 +757,37 @@ function updateBackgroundMusic() {
         newSrc = 'Audio/Background_waves.mp3';
     }
     
-    // Only change if the track is actually different
     const currentSrc = bgMusic.src;
     if (!currentSrc.endsWith(newSrc)) {
-        const currentTime = bgMusic.currentTime; // Save current position
         const wasPlaying = !bgMusic.paused;
-        
         bgMusic.src = newSrc;
-        bgMusic.currentTime = 0; // Start new track from beginning
-        
+        bgMusic.currentTime = 0;
         if (wasPlaying) {
             bgMusic.play();
         }
     }
-    // If same track, do nothing - let it continue playing
 }
 
 function checkMusicStageChange() {
     if (!gameState.audioEnabled) return;
     
-    // Check if we just hit stage 2 (decision count is exactly 20)
     if (gameState.decisionCount === 20) {
-        playSound('thunder'); // Or whatever sound you want
+        playSound('thunder');
     }
     
-    // Optional: Check for stage 3
     if (gameState.decisionCount === 40) {
         playSound('thunder');
+    }
+}
+
+// Update hotspots container dimensions to match the displayed image
+function updateHotspotsContainer() {
+    const img = document.getElementById('gameImage');
+    const container = document.getElementById('hotspotsContainer');
+    
+    if (img && container) {
+        container.style.width = img.offsetWidth + 'px';
+        container.style.height = img.offsetHeight + 'px';
     }
 }
 
@@ -796,18 +802,23 @@ function loadScene(sceneKey) {
     setTimeout(() => {
         img.src = getSceneImage(scene);
         img.classList.remove('fade-out');
-        renderHotspots(scene);
+        
+        // Wait for image to load before updating hotspots
+        img.onload = () => {
+            updateHotspotsContainer();
+            renderHotspots(scene);
+        };
+        
         updateInventory();
         updateBackgroundMusic();
     }, 300);
 }
 
-// Update the renderHotspots function to show ending text:
+// Render hotspots positioned relative to image dimensions
 function renderHotspots(scene) {
     const container = document.getElementById('hotspotsContainer');
     container.innerHTML = '';
     
-    // Check if this scene has ending text
     if (scene.endingText) {
         const textOverlay = document.createElement('div');
         textOverlay.className = 'ending-text-overlay';
@@ -828,10 +839,17 @@ function renderHotspots(scene) {
         
         const hotspotDiv = document.createElement('div');
         hotspotDiv.className = 'hotspot';
-        hotspotDiv.style.left = hotspot.x + '%';
-        hotspotDiv.style.top = hotspot.y + '%';
-        hotspotDiv.style.width = hotspot.width + '%';
-        hotspotDiv.style.height = hotspot.height + '%';
+        
+        // Convert pixel coordinates to percentages relative to IMAGE_WIDTH and IMAGE_HEIGHT
+        const leftPercent = (hotspot.x / IMAGE_WIDTH) * 100;
+        const topPercent = (hotspot.y / IMAGE_HEIGHT) * 100;
+        const widthPercent = (hotspot.width / IMAGE_WIDTH) * 100;
+        const heightPercent = (hotspot.height / IMAGE_HEIGHT) * 100;
+        
+        hotspotDiv.style.left = leftPercent + '%';
+        hotspotDiv.style.top = topPercent + '%';
+        hotspotDiv.style.width = widthPercent + '%';
+        hotspotDiv.style.height = heightPercent + '%';
         
         hotspotDiv.onclick = () => {
             if (hotspot.type === 'inspect') {
@@ -852,28 +870,24 @@ function renderHotspots(scene) {
     });
 }
 
-
-
-// Update makeChoice to handle restart and use long fade for endings:
+// Make a choice and handle game logic
 function makeChoice(hotspot) {
     playSound(hotspot.sound);
     gameState.decisionCount++;
     checkMusicStageChange();
     
-    // Check for restart flag
     if (hotspot.restart) {
-        // Reset game state
         gameState.inventory = [];
         gameState.decisionCount = 0;
     }
     
     if (gameState.decisionCount === 40 && !gameState.inventory.includes('phonecall')) {
-        loadSceneWithLongFade('lose1', 2000);  // Use long fade for endings
+        loadSceneWithLongFade('lose1', 2000);
         return;
     }
 
     if (gameState.decisionCount === 40 && gameState.inventory.includes('phonecall')) {
-        loadSceneWithLongFade('win1', 2000);   // Use long fade for endings
+        loadSceneWithLongFade('win1', 2000);
         return;
     }
     
@@ -903,7 +917,6 @@ function addDigit(digit) {
         updatePasswordDisplay();
         playSound('switch');
         
-        // Auto-check when 4 digits entered
         if (gameState.passwordInput.length === 4) {
             setTimeout(() => {
                 checkPassword();
@@ -930,7 +943,6 @@ function checkPassword() {
     const display = document.getElementById('passwordDisplay');
     
     if (gameState.passwordInput === hotspot.password) {
-        // Correct password
         display.classList.add('success');
         playSound('correct');
         playSound('boop');
@@ -945,7 +957,6 @@ function checkPassword() {
             loadScene(gameState.currentScene);
         }, 800);
     } else {
-        // Wrong password
         display.classList.add('shake');
         playSound('incorrect');
         
@@ -1044,7 +1055,7 @@ function updateInventory() {
     decisionCount.textContent = gameState.decisionCount;
 }
 
-// Update the startGame function:
+// Start game
 function startGame() {
     const titleScreen = document.getElementById('titleScreen');
     const blackScreen = document.getElementById('blackScreen');
@@ -1053,7 +1064,6 @@ function startGame() {
     
     titleScreen.classList.add('hidden');
     
-    // Start preloading images
     preloadImages();
     
     setTimeout(() => {
@@ -1067,7 +1077,7 @@ function startGame() {
     }, 2000);
 }
 
-// Add this new function for longer fade transitions
+// Load scene with long fade
 function loadSceneWithLongFade(sceneKey, fadeDelay = 2000) {
     gameState.currentScene = sceneKey;
     const scene = scenes[sceneKey];
@@ -1078,11 +1088,15 @@ function loadSceneWithLongFade(sceneKey, fadeDelay = 2000) {
     setTimeout(() => {
         img.src = getSceneImage(scene);
         img.classList.remove('fade-out');
-        renderHotspots(scene);
+        
+        img.onload = () => {
+            updateHotspotsContainer();
+            renderHotspots(scene);
+        };
+        
         updateInventory();
         updateBackgroundMusic();
         
-        // Auto-advance to next scene if specified
         if (scene.autoAdvance) {
             setTimeout(() => {
                 loadSceneWithLongFade(scene.autoAdvance.next, scene.autoAdvance.delay || 2000);
@@ -1100,19 +1114,20 @@ function toggleDebugMode() {
     mousePos.classList.toggle('active');
 }
 
-// Track mouse position for hotspot placement
+// Track mouse position for hotspot placement (shows pixel coordinates)
 document.addEventListener('mousemove', function(e) {
     const mousePos = document.getElementById('mousePosition');
     if (!mousePos.classList.contains('active')) return;
     
-    const container = document.getElementById('gameContainer');
-    const rect = container.getBoundingClientRect();
+    const img = document.getElementById('gameImage');
+    const rect = img.getBoundingClientRect();
     
-    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+    // Calculate position relative to the image in pixels
+    const pixelX = ((e.clientX - rect.left) / rect.width * IMAGE_WIDTH).toFixed(2);
+    const pixelY = ((e.clientY - rect.top) / rect.height * IMAGE_HEIGHT).toFixed(2);
     
-    document.getElementById('mouseX').textContent = x;
-    document.getElementById('mouseY').textContent = y;
+    document.getElementById('mouseX').textContent = pixelX + 'px';
+    document.getElementById('mouseY').textContent = pixelY + 'px';
 });
 
 // Click to copy coordinates
@@ -1131,20 +1146,17 @@ document.getElementById('mousePosition').addEventListener('click', function(e) {
     });
 });
 
-// Add this function to preload images
+// Preload images
 function preloadImages() {
     const imagesToPreload = [];
     
-    // Collect all image URLs from scenes
     Object.values(scenes).forEach(scene => {
-        // Add default images
         if (scene.images) {
             imagesToPreload.push(scene.images.default);
             if (scene.images.stage2) imagesToPreload.push(scene.images.stage2);
             if (scene.images.stage3) imagesToPreload.push(scene.images.stage3);
         }
         
-        // Add conditional images
         if (scene.conditionalImages) {
             scene.conditionalImages.forEach(condImg => {
                 if (condImg.images) {
@@ -1155,7 +1167,6 @@ function preloadImages() {
             });
         }
         
-        // Add inspect images
         if (scene.hotspots) {
             scene.hotspots.forEach(hotspot => {
                 if (hotspot.inspectImage) {
@@ -1165,15 +1176,17 @@ function preloadImages() {
         }
     });
     
-    // Remove duplicates
     const uniqueImages = [...new Set(imagesToPreload)];
     
-    // Preload each image
     uniqueImages.forEach(src => {
-        if (src && !src.startsWith('http')) { // Only preload local images
+        if (src && !src.startsWith('http')) {
             const img = new Image();
             img.src = src;
         }
     });
 }
 
+// Update hotspots container on window resize
+window.addEventListener('resize', () => {
+    updateHotspotsContainer();
+});

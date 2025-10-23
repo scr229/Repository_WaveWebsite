@@ -73,7 +73,7 @@ body {
 
 .black-screen img {
     display: flex;
-    justify-content: center; /* Centers horizontally */
+    justify-content: center;
     top: 70%;
     height: 80%;
     object-fit: cover;
@@ -114,13 +114,14 @@ body {
     opacity: 0;
 }
 
+/* UPDATED: Hotspots container now positioned relative to image */
 .hotspots-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     pointer-events: none;
+    /* Width and height will be set dynamically by JavaScript to match displayed image size */
 }
 
 .hotspot {
