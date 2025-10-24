@@ -126,17 +126,35 @@ body {
 
 .hotspot {
     position: absolute;
-    background: rgba(255, 255, 255, 0);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 90%);
     border: 2px solid rgba(255, 255, 255, 0);
-    transition: all 0.2s;
+    border-radius: 50%;
+    transition: all 0.3s ease;
     pointer-events: auto;
     cursor: pointer;
     z-index: 10;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2),
+                inset 0 0 15px rgba(255, 255, 255, 0.1);
+    animation: pulse-glow 3s ease-in-out infinite;
 }
 
 .hotspot:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 90%);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(100, 200, 255, 0.5),
+                inset 0 0 20px rgba(100, 200, 255, 0.2);
+    transform: scale(1.05);
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2),
+                    inset 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.3),
+                    inset 0 0 20px rgba(255, 255, 255, 0.15);
+    }
 }
 
 .debug-mode .hotspot {
@@ -254,18 +272,29 @@ body {
     background: rgba(0, 0, 0, 0.95);
 }
 
-.numpad-container {
-    position: relative;
-    max-width: 600px;
-    max-height: 80vh;
+.password-overlay.active {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.numberpad-container {
+    position: relative;
+    width: auto;
+    height: auto;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
 
 .numberpad-image {
-    width: auto;
+    width: 100%;
     height: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    object-fit: contain;
     display: block;
 }
 
@@ -298,6 +327,141 @@ body {
     animation: glow 0.5s;
 }
 
+/* Number Pad Grid */
+.numpad-grid {
+    position: absolute;
+    top: 28%;
+    left: 49%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 12px;
+    width: 35%;
+    height: 5%;
+    z-index: 5;
+}
+
+.numpad-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    border: 2px solid rgba(0, 255, 0, 0.5);
+    border-radius: 10px;
+    color: #0f0;
+    font-family: "consolas", monospace;
+    font-size: 12px;
+    z-index: 1000;
+    display: none !important;  /* Added !important */
+    flex-direction: column;
+    gap: 10px;
+    min-width: 400px;
+}
+
+/* Remove or comment out this rule */
+/*
+.password-overlay.active .numpad-controls {
+    display: flex;
+}
+*/
+
+.password-overlay.active .numpad-controls {
+    display: flex;
+}
+
+.numpad-control-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.numpad-control-row label {
+    min-width: 80px;
+}
+
+.numpad-control-row input {
+    flex: 1;
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    color: #0f0;
+    padding: 5px;
+    font-family: "consolas", monospace;
+}
+
+.numpad-control-row button {
+    background: rgba(0, 255, 0, 0.2);
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    color: #0f0;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: "consolas", monospace;
+}
+
+.numpad-control-row button:hover {
+    background: rgba(0, 255, 0, 0.4);
+}
+
+.numpad-controls-code {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(0, 255, 0, 0.05);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    font-size: 10px;
+    word-wrap: break-word;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.numpad-btn {
+    background: radial-gradient(circle, rgba(0, 255, 0, 0.1) 0%, rgba(0, 255, 0, 0) 70%);
+    border: 2px solid rgba(0, 255, 0, 0);
+    color: transparent;
+    font-size: 24px;
+    font-family: "consolas", monospace;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.1),
+                inset 0 0 10px rgba(0, 255, 0, 0.05);
+    animation: pulse-glow-green 3s ease-in-out infinite;
+}
+
+.numpad-btn:hover {
+    background: radial-gradient(circle, rgba(0, 255, 0, 0.3) 0%, rgba(0, 255, 0, 0) 70%);
+    border: 2px solid rgba(0, 255, 0, 0.4);
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.4),
+                inset 0 0 15px rgba(0, 255, 0, 0.2);
+    transform: scale(1.1);
+}
+
+.numpad-btn:active {
+    background: radial-gradient(circle, rgba(0, 255, 0, 0.5) 0%, rgba(0, 255, 0, 0) 70%);
+    box-shadow: 0 0 35px rgba(0, 255, 0, 0.6),
+                inset 0 0 20px rgba(0, 255, 0, 0.3);
+    transform: scale(0.95);
+}
+
+@keyframes pulse-glow-green {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.1),
+                    inset 0 0 10px rgba(0, 255, 0, 0.05);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.15),
+                    inset 0 0 12px rgba(0, 255, 0, 0.08);
+    }
+}
+
+/* Show button text in debug mode */
+.debug-mode .numpad-btn {
+    background: rgba(255, 0, 0, 0.3);
+    border: 2px solid rgba(255, 0, 0, 0.8);
+    color: white;
+}
+
 @keyframes shake {
     0%, 100% { transform: translateX(-50%) translateY(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-50%) translateY(-10px); }
@@ -307,15 +471,6 @@ body {
 @keyframes glow {
     0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
     50% { box-shadow: 0 0 30px rgba(0, 255, 0, 1); }
-}
-
-.numpad-hotspot {
-    position: absolute;
-    background: rgba(255, 0, 0, 0);
-    border: 2px solid rgba(255, 0, 0, 0);
-    cursor: pointer;
-    transition: all 0.2s;
-    z-index: 5;
 }
 
 /* Ending Text Overlay */
@@ -381,16 +536,6 @@ body {
     50% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.6); }
 }
 
-/* Show hotspots when debug mode */
-.debug-numpad .numpad-hotspot {
-    background: rgba(255, 0, 0, 0.3);
-    border: 2px solid rgba(255, 0, 0, 0.8);
-}
-
-.numpad-hotspot:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
 /* PRODUCTION MODE - Hide all debug elements */
 .debug-toggle,
 .mouse-position,
@@ -398,8 +543,32 @@ body {
     display: none !important;
 }
 
-/* Remove hotspot hover effects in production */
+/* OPTIONAL: Remove glow effects in production by uncommenting these lines */
+/*
+.hotspot {
+    background: rgba(255, 255, 255, 0) !important;
+    border: 2px solid rgba(255, 255, 255, 0) !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
 .hotspot:hover {
     background: rgba(255, 255, 255, 0) !important;
     border: 2px solid rgba(255, 255, 255, 0) !important;
+    box-shadow: none !important;
+    transform: none !important;
 }
+
+.numpad-btn {
+    background: rgba(0, 255, 0, 0) !important;
+    border: 2px solid rgba(0, 255, 0, 0) !important;
+    box-shadow: none !important;
+    animation: none !important;
+}
+
+.numpad-btn:hover {
+    background: rgba(0, 255, 0, 0) !important;
+    border: 2px solid rgba(0, 255, 0, 0) !important;
+    box-shadow: none !important;
+}
+*/

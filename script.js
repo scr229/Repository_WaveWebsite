@@ -238,15 +238,6 @@ const scenes = {
                 y: 386.65,
                 width: 19.20,
                 height: 35.15,
-                item: null,
-                sound: 'switch',
-                condition: () => !gameState.inventory.includes('phone'),
-            },
-            {
-                x: 80.40,
-                y: 386.65,
-                width: 19.20,
-                height: 35.15,
                 next: 'phonecall',
                 item: null,
                 sound: 'switch',
@@ -800,14 +791,27 @@ function loadScene(sceneKey) {
     img.classList.add('fade-out');
     
     setTimeout(() => {
-        img.src = getSceneImage(scene);
-        img.classList.remove('fade-out');
+        const newImageSrc = getSceneImage(scene);
         
-        // Wait for image to load before updating hotspots
-        img.onload = () => {
+        // Function to update hotspots
+        const updateScene = () => {
             updateHotspotsContainer();
             renderHotspots(scene);
         };
+        
+        // Check if image source is actually changing
+        if (img.src === newImageSrc || img.src.endsWith(newImageSrc)) {
+            // Same image, update immediately
+            img.classList.remove('fade-out');
+            updateScene();
+        } else {
+            // Different image, wait for load
+            img.onload = () => {
+                updateScene();
+            };
+            img.src = newImageSrc;
+            img.classList.remove('fade-out');
+        }
         
         updateInventory();
         updateBackgroundMusic();
@@ -909,6 +913,93 @@ function openPasswordPrompt(hotspot) {
     passwordOverlay.classList.add('active');
     
     window.currentPasswordHotspot = hotspot;
+    
+    // Show numpad controls in debug mode
+    const debugActive = document.getElementById('gameContainer').classList.contains('debug-mode');
+    const numpadControls = document.getElementById('numpadControls');
+    if (debugActive && numpadControls) {
+        numpadControls.style.display = 'flex';
+        initNumpadControls();
+    }
+}
+
+// Initialize numberpad adjustment controls
+function initNumpadControls() {
+    const grid = document.getElementById('numpadGrid');
+    
+    // Get sliders
+    const topSlider = document.getElementById('numpadTop');
+    const leftSlider = document.getElementById('numpadLeft');
+    const widthSlider = document.getElementById('numpadWidth');
+    const heightSlider = document.getElementById('numpadHeight');
+    const gapSlider = document.getElementById('numpadGap');
+    
+    // Update function
+    function updateNumpadGrid() {
+        const top = topSlider.value;
+        const left = leftSlider.value;
+        const width = widthSlider.value;
+        const height = heightSlider.value;
+        const gap = gapSlider.value;
+        
+        grid.style.top = top + '%';
+        grid.style.left = left + '%';
+        grid.style.width = width + '%';
+        grid.style.height = height + '%';
+        grid.style.gap = gap + 'px';
+        
+        // Update value displays
+        document.getElementById('numpadTopValue').textContent = top + '%';
+        document.getElementById('numpadLeftValue').textContent = left + '%';
+        document.getElementById('numpadWidthValue').textContent = width + '%';
+        document.getElementById('numpadHeightValue').textContent = height + '%';
+        document.getElementById('numpadGapValue').textContent = gap + 'px';
+        
+        // Update CSS code display
+        updateNumpadCSSCode(top, left, width, height, gap);
+    }
+    
+    // Add event listeners
+    topSlider.addEventListener('input', updateNumpadGrid);
+    leftSlider.addEventListener('input', updateNumpadGrid);
+    widthSlider.addEventListener('input', updateNumpadGrid);
+    heightSlider.addEventListener('input', updateNumpadGrid);
+    gapSlider.addEventListener('input', updateNumpadGrid);
+    
+    // Initial update
+    updateNumpadGrid();
+}
+
+// Update CSS code display
+function updateNumpadCSSCode(top, left, width, height, gap) {
+    const code = `.numpad-grid {
+    top: ${top}%;
+    left: ${left}%;
+    width: ${width}%;
+    height: ${height}%;
+    gap: ${gap}px;
+}`;
+    
+    document.getElementById('numpadCSSCode').textContent = code;
+}
+
+// Reset numberpad grid to defaults
+function resetNumpadGrid() {
+    document.getElementById('numpadTop').value = 28;
+    document.getElementById('numpadLeft').value = 50;
+    document.getElementById('numpadWidth').value = 15;
+    document.getElementById('numpadHeight').value = 32;
+    document.getElementById('numpadGap').value = 8;
+    
+    initNumpadControls();
+}
+
+// Copy CSS to clipboard
+function copyNumpadCSS() {
+    const code = document.getElementById('numpadCSSCode').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        alert('CSS copied to clipboard!');
+    });
 }
 
 function addDigit(digit) {
@@ -969,7 +1060,12 @@ function checkPassword() {
 
 function closePasswordPrompt() {
     const passwordOverlay = document.getElementById('passwordOverlay');
+    const numpadControls = document.getElementById('numpadControls');
+    
     passwordOverlay.classList.remove('active');
+    if (numpadControls) {
+        numpadControls.style.display = 'none';
+    }
     gameState.passwordInput = '';
     playSound('switch');
 }
@@ -1089,10 +1185,20 @@ function loadSceneWithLongFade(sceneKey, fadeDelay = 2000) {
         img.src = getSceneImage(scene);
         img.classList.remove('fade-out');
         
-        img.onload = () => {
+        // Function to update hotspots
+        const updateScene = () => {
             updateHotspotsContainer();
             renderHotspots(scene);
         };
+        
+        // Wait for image to load
+        if (img.complete) {
+            // Image is already loaded (cached)
+            updateScene();
+        } else {
+            // Wait for image to load
+            img.onload = updateScene;
+        }
         
         updateInventory();
         updateBackgroundMusic();

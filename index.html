@@ -13,8 +13,8 @@
 
     <!-- Mouse Position Display -->
     <div class="mouse-position" id="mousePosition">
-        <div>X: <span id="mouseX">0</span>%</div>
-        <div>Y: <span id="mouseY">0</span>%</div>
+        <div>X: <span id="mouseX">0</span></div>
+        <div>Y: <span id="mouseY">0</span></div>
         <div style="margin-top: 5px; border-top: 1px solid rgba(0,255,0,0.3); padding-top: 5px;">
             Click to copy
         </div>
@@ -55,25 +55,71 @@
 
     <!-- Password Number Pad Overlay -->
     <div class="overlay password-overlay" id="passwordOverlay">
-        <img src="Photos/Numberpad.png" class="numberpad-image" alt="Number Pad">
-        <div class="password-display-overlay" id="passwordDisplay">----</div>
+        <div class="numberpad-container">
+            <img src="Photos/Numberpad.png" class="numberpad-image" alt="Number Pad">
+            <div class="password-display-overlay" id="passwordDisplay">----</div>
+            
+            <!-- 3x4 Grid of number pad buttons -->
+            <div class="numpad-grid" id="numpadGrid">
+                <button class="numpad-btn" onclick="addDigit('1')">1</button>
+                <button class="numpad-btn" onclick="addDigit('2')">2</button>
+                <button class="numpad-btn" onclick="addDigit('3')">3</button>
+                
+                <button class="numpad-btn" onclick="addDigit('4')">4</button>
+                <button class="numpad-btn" onclick="addDigit('5')">5</button>
+                <button class="numpad-btn" onclick="addDigit('6')">6</button>
+                
+                <button class="numpad-btn" onclick="addDigit('7')">7</button>
+                <button class="numpad-btn" onclick="addDigit('8')">8</button>
+                <button class="numpad-btn" onclick="addDigit('9')">9</button>
+                
+                <button class="numpad-btn numpad-clear" onclick="clearPassword()">C</button>
+                <button class="numpad-btn" onclick="addDigit('0')">0</button>
+                <button class="numpad-btn numpad-close" onclick="closePasswordPrompt()">X</button>
+            </div>
+        </div>
         
-        <!-- Invisible hotspots over number pad image -->
-        <div class="numpad-hotspot" style="left: 43%; top: 28%; width: 3%; height: 5%;" onclick="addDigit('1')"></div>
-        <div class="numpad-hotspot" style="left: 48%; top: 28%; width: 3%; height: 5%;" onclick="addDigit('2')"></div>
-        <div class="numpad-hotspot" style="left: 53%; top: 28%; width: 3%; height: 5%;" onclick="addDigit('3')"></div>
-        
-        <div class="numpad-hotspot" style="left: 43%; top: 36%; width: 3%; height: 5%;" onclick="addDigit('4')"></div>
-        <div class="numpad-hotspot" style="left: 48%; top: 36%; width: 3%; height: 5%;" onclick="addDigit('5')"></div>
-        <div class="numpad-hotspot" style="left: 53%; top: 36%; width: 3%; height: 5%;" onclick="addDigit('6')"></div>
-        
-        <div class="numpad-hotspot" style="left: 43%; top: 45%; width: 3%; height: 5%;" onclick="addDigit('7')"></div>
-        <div class="numpad-hotspot" style="left: 48%; top: 45%; width: 3%; height: 5%;" onclick="addDigit('8')"></div>
-        <div class="numpad-hotspot" style="left: 53%; top: 45%; width: 3%; height: 5%;" onclick="addDigit('9')"></div>
-        
-        <div class="numpad-hotspot" style="left: 43%; top: 53%; width: 3%; height: 5%;" onclick="clearPassword()"></div>
-        <div class="numpad-hotspot" style="left: 48%; top: 53%; width: 3%; height: 5%;" onclick="addDigit('0')"></div>
-        <div class="numpad-hotspot" style="left: 53%; top: 53%; width: 3%; height: 5%;" onclick="closePasswordPrompt()"></div>
+        <!-- Adjustment Controls (only visible in debug mode) -->
+        <div class="numpad-controls" id="numpadControls">
+            <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">NUMPAD GRID ADJUSTMENT</div>
+            
+            <div class="numpad-control-row">
+                <label>Top:</label>
+                <input type="range" id="numpadTop" min="0" max="60" value="28" step="0.5">
+                <span id="numpadTopValue">28%</span>
+            </div>
+            
+            <div class="numpad-control-row">
+                <label>Left:</label>
+                <input type="range" id="numpadLeft" min="30" max="70" value="50" step="0.5">
+                <span id="numpadLeftValue">50%</span>
+            </div>
+            
+            <div class="numpad-control-row">
+                <label>Width:</label>
+                <input type="range" id="numpadWidth" min="5" max="40" value="15" step="0.5">
+                <span id="numpadWidthValue">15%</span>
+            </div>
+            
+            <div class="numpad-control-row">
+                <label>Height:</label>
+                <input type="range" id="numpadHeight" min="10" max="60" value="32" step="0.5">
+                <span id="numpadHeightValue">32%</span>
+            </div>
+            
+            <div class="numpad-control-row">
+                <label>Gap:</label>
+                <input type="range" id="numpadGap" min="0" max="20" value="8" step="1">
+                <span id="numpadGapValue">8px</span>
+            </div>
+            
+            <div class="numpad-control-row">
+                <button onclick="resetNumpadGrid()">Reset</button>
+                <button onclick="copyNumpadCSS()">Copy CSS</button>
+            </div>
+            
+            <div class="numpad-controls-code" id="numpadCSSCode"></div>
+        </div>
     </div>
 
 
@@ -138,7 +184,7 @@
     <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()">🔊</button>
     
     <script src="script.js"></script>
-    <link rel="stylesheet" href="style.css?v=3">
-    <script src="script.js?v=3"></script>
+    <link rel="stylesheet" href="style.css?v=4">
+    <script src="script.js?v=4"></script>
 </body>
 </html>
